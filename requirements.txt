@@ -1,0 +1,8 @@
+pystray>=0.19.5
+Pillow>=11.2.1
+pynput>=1.7.7
+sounddevice>=0.5.1
+numpy>=2.2.0
+faster-whisper>=1.1.1
+requests>=2.32.3
+nvidia-cublas-cu12>=12.9.1.4

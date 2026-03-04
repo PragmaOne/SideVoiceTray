@@ -1,0 +1,91 @@
+{
+  "audio": {
+    "sample_rate": 16000,
+    "channels": 1
+  },
+  "stt": {
+    "model": "large-v3",
+    "device": "auto",
+    "compute_type": "float16",
+    "language": "ru",
+    "beam_size": 12,
+    "best_of": 12,
+    "patience": 1.3,
+    "temperature": 0.0,
+    "repetition_penalty": 1.0,
+    "condition_on_previous_text": true,
+    "compression_ratio_threshold": 2.4,
+    "log_prob_threshold": -1.0,
+    "no_speech_threshold": 0.45,
+    "vad_filter": true,
+    "vad_parameters": {
+      "threshold": 0.45,
+      "min_speech_duration_ms": 120,
+      "min_silence_duration_ms": 380,
+      "speech_pad_ms": 230
+    },
+    "mixed_language_fallback": false,
+    "language_detection_threshold": 0.4,
+    "language_detection_segments": 3,
+    "whisper_rescue_enabled": true,
+    "low_confidence_avg_logprob": -1.0,
+    "low_confidence_no_speech_prob": 0.75,
+    "audio_boost_enabled": false,
+    "target_rms": 0.09,
+    "max_gain_db": 28.0,
+    "min_input_rms": 0.00045,
+    "retry_without_vad": true,
+    "sensitive_beam_size": 16,
+    "sensitive_best_of": 16,
+    "sensitive_patience": 2.0,
+    "sensitive_no_speech_threshold": 0.28,
+    "sensitive_log_prob_threshold": -1.35,
+    "initial_prompt": null,
+    "hotwords": [
+      "Python",
+      "Docker",
+      "GitHub",
+      "API",
+      "SQL",
+      "JavaScript",
+      "TypeScript",
+      "Windows",
+      "Telegram",
+      "YouTube",
+      "OpenAI",
+      "LM Studio",
+      "блять",
+      "блядь",
+      "сука",
+      "нахуй",
+      "пиздец",
+      "хуй",
+      "ебать",
+      "ебаный"
+    ]
+  },
+  "lm_studio": {
+    "enabled": true,
+    "base_url": "http://127.0.0.1:1234/v1",
+    "model": "qwen3.5",
+    "temperature": 0.0,
+    "max_output_tokens": 1500,
+    "repair_retries": 4,
+    "quality_second_pass": true,
+    "quality_refine_passes": 3,
+    "timeout_seconds": 90
+  },
+  "hotkey": {
+    "mouse_button": "x1"
+  },
+  "typing": {
+    "append_space": true
+  },
+  "output": {
+    "target_language": "none"
+  },
+  "ui": {
+    "recording_text": "REC",
+    "processing_text": "PROCESSING"
+  }
+}
