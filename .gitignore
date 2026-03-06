@@ -1,14 +1,51 @@
-.venv/
+# Python
 __pycache__/
-*.pyc
-config.json
-.env
-.env.*
-*.log
+*.py[cod]
+*$py.class
+.Python
+.venv/
+venv/
+env/
+ENV/
 .pytest_cache/
 .mypy_cache/
 .ruff_cache/
+
+# Local configuration and secrets
+config.json
+.env
+.env.*
+!.env.example
+
+# Logs and runtime state
+*.log
+*.out
+*.err
+source-launch.log
+startup.stdout.log
+startup.stderr.log
+
+# Build artifacts
+build/
+dist/
+installer-dist/
+models/
+
+# Local installer/tool downloads
+tools/
+
+# OS / editor files
 .idea/
 .vscode/
 Thumbs.db
 .DS_Store
+
+# Optional local test/output scratch
+*.tmp
+*.bak
+*.old
+*.orig
+*.rej
+
+# Keep build scripts and specs tracked
+!*.spec

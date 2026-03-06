@@ -1,0 +1,3455 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Speaking Lab</title>
+  <link rel="icon" href="data:,">
+  <style>
+    :root {
+      --paper: #f6efe3;
+      --paper-2: #fff9ef;
+      --ink: #171717;
+      --ink-soft: #5b564d;
+      --line: rgba(23, 23, 23, 0.12);
+      --ember: #d85b2d;
+      --ember-deep: #9a3412;
+      --teal: #0f766e;
+      --blue: #1d4ed8;
+      --lime: #4d7c0f;
+      --panel: rgba(255, 250, 243, 0.78);
+      --shadow: 0 24px 60px rgba(70, 47, 18, 0.12);
+      --radius-lg: 28px;
+      --radius-md: 18px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(216, 91, 45, 0.16), transparent 26%),
+        radial-gradient(circle at 85% 15%, rgba(15, 118, 110, 0.18), transparent 24%),
+        radial-gradient(circle at 70% 80%, rgba(29, 78, 216, 0.14), transparent 28%),
+        linear-gradient(180deg, #f8f1e7 0%, #f3eadb 52%, #efe3d0 100%);
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0.14;
+      background-image:
+        linear-gradient(rgba(23, 23, 23, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(23, 23, 23, 0.03) 1px, transparent 1px);
+      background-size: 26px 26px;
+      mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.92), rgba(0, 0, 0, 0.35));
+    }
+
+    .app-shell {
+      width: min(1440px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 28px 0 54px;
+      position: relative;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1.35fr 0.95fr;
+      gap: 18px;
+      margin-bottom: 18px;
+    }
+
+    .focus-strip {
+      margin-bottom: 18px;
+    }
+
+    .hero-card,
+    .panel {
+      position: relative;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.52);
+      border-radius: var(--radius-lg);
+      background: var(--panel);
+      backdrop-filter: blur(16px);
+      box-shadow: var(--shadow);
+    }
+
+    .hero-card::after,
+    .panel::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background:
+        linear-gradient(135deg, rgba(255, 255, 255, 0.3), transparent 22%),
+        linear-gradient(315deg, rgba(255, 255, 255, 0.18), transparent 26%);
+    }
+
+    .hero-copy {
+      padding: 26px 28px 24px;
+      min-height: 280px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      background:
+        linear-gradient(145deg, rgba(255, 250, 243, 0.92), rgba(255, 240, 228, 0.76)),
+        linear-gradient(180deg, rgba(216, 91, 45, 0.08), rgba(15, 118, 110, 0.08));
+    }
+
+    .eyebrow,
+    .panel-kicker,
+    .stat-label,
+    .timer-label,
+    .stage-label,
+    .step-status,
+    .history-meta {
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+    }
+
+    .eyebrow {
+      margin: 0 0 8px;
+      color: var(--ember-deep);
+    }
+
+    h1,
+    h2,
+    h3 {
+      margin: 0;
+      font-family: Georgia, "Palatino Linotype", serif;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+    }
+
+    h1 {
+      font-size: clamp(3rem, 5vw, 4.8rem);
+      line-height: 0.94;
+      max-width: 10ch;
+    }
+
+    .hero-lead,
+    .panel-copy,
+    .chunk-note,
+    .history-note,
+    .weak-card p,
+    .pron-note,
+    .fluency-note,
+    .footer-note,
+    .mission-step-copy,
+    .mission-quote,
+    .status-line {
+      line-height: 1.58;
+      color: var(--ink-soft);
+    }
+
+    .hero-lead {
+      max-width: 60ch;
+      margin: 12px 0 0;
+      font-size: 1.02rem;
+    }
+
+    .hero-actions,
+    .clip-controls,
+    .chunk-actions,
+    .pron-controls,
+    .fluency-controls,
+    .reflection-actions,
+    .hero-meta,
+    .mastery-row,
+    .drill-chips {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .hero-actions {
+      margin-top: 18px;
+    }
+
+    button,
+    .chip-button {
+      border: 0;
+      cursor: pointer;
+      border-radius: 999px;
+      font: inherit;
+      transition: transform 160ms ease, box-shadow 160ms ease, background 160ms ease, color 160ms ease;
+    }
+
+    button:hover,
+    .chip-button:hover {
+      transform: translateY(-2px);
+    }
+
+    button:active,
+    .chip-button:active {
+      transform: translateY(0);
+    }
+
+    .button-primary,
+    .button-secondary,
+    .button-ghost {
+      padding: 12px 18px;
+      font-weight: 700;
+      letter-spacing: 0.01em;
+    }
+
+    .button-primary {
+      color: #fff;
+      background: linear-gradient(135deg, var(--ember), #ef7f52);
+      box-shadow: 0 14px 28px rgba(216, 91, 45, 0.26);
+    }
+
+    .button-secondary {
+      color: #fff;
+      background: linear-gradient(135deg, var(--teal), #179b90);
+      box-shadow: 0 14px 28px rgba(15, 118, 110, 0.24);
+    }
+
+    .button-ghost {
+      color: var(--ink);
+      background: rgba(255, 255, 255, 0.68);
+      border: 1px solid rgba(23, 23, 23, 0.1);
+    }
+
+    .button-ghost.is-danger {
+      color: var(--ember-deep);
+      background: rgba(255, 244, 240, 0.92);
+    }
+
+    .meta-chip,
+    .tag,
+    .mini-tag,
+    .drill-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border-radius: 999px;
+      font-weight: 700;
+    }
+
+    .meta-chip {
+      padding: 10px 14px;
+      background: rgba(255, 255, 255, 0.68);
+      border: 1px solid rgba(23, 23, 23, 0.08);
+      color: var(--ink-soft);
+    }
+
+    .hero-stats {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+      padding: 14px;
+      background:
+        linear-gradient(180deg, rgba(16, 24, 40, 0.95), rgba(17, 17, 17, 0.92)),
+        radial-gradient(circle at top right, rgba(77, 124, 15, 0.3), transparent 34%);
+      color: #f8fafc;
+    }
+
+    .stat-card {
+      padding: 18px;
+      border-radius: 22px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      min-height: 120px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .stat-label {
+      color: rgba(248, 250, 252, 0.72);
+    }
+
+    .stat-value {
+      font-family: Georgia, "Palatino Linotype", serif;
+      font-size: clamp(1.9rem, 3vw, 2.8rem);
+      line-height: 1;
+      letter-spacing: -0.04em;
+    }
+
+    .stat-note {
+      font-size: 0.92rem;
+      line-height: 1.5;
+      color: rgba(248, 250, 252, 0.82);
+    }
+
+    .dashboard {
+      display: grid;
+      grid-template-columns: 1.1fr 1.1fr 0.95fr;
+      gap: 18px;
+      align-items: start;
+    }
+
+    .panel {
+      padding: 22px;
+    }
+
+    .mission-panel { grid-column: 1 / span 1; min-height: 310px; background: linear-gradient(180deg, rgba(255, 247, 237, 0.96), rgba(255, 242, 229, 0.88)); }
+    .clip-panel { grid-column: 2 / span 2; min-height: 620px; background: linear-gradient(160deg, rgba(16, 24, 40, 0.96), rgba(29, 38, 62, 0.92)); color: #eff6ff; }
+    .chunk-panel { grid-column: 1 / span 1; min-height: 360px; background: linear-gradient(180deg, rgba(255, 252, 245, 0.96), rgba(254, 248, 239, 0.88)); }
+    .pron-panel { grid-column: 2 / span 1; min-height: 540px; background: linear-gradient(180deg, rgba(239, 246, 255, 0.98), rgba(222, 236, 255, 0.9)); }
+    .fluency-panel { grid-column: 3 / span 1; min-height: 540px; background: linear-gradient(180deg, rgba(245, 251, 235, 0.98), rgba(233, 244, 213, 0.9)); }
+    .progress-panel { grid-column: 1 / span 3; min-height: 330px; background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(248, 245, 239, 0.9)); }
+    .free-speaking-panel {
+      background:
+        radial-gradient(circle at 88% 22%, rgba(29, 78, 216, 0.14), transparent 24%),
+        radial-gradient(circle at 14% 78%, rgba(15, 118, 110, 0.12), transparent 28%),
+        linear-gradient(135deg, rgba(246, 253, 242, 0.98), rgba(231, 244, 221, 0.92));
+    }
+
+    .panel-header,
+    .chunk-head,
+    .history-head,
+    .pron-score,
+    .stage-topline {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 14px;
+    }
+
+    .panel-title {
+      font-size: clamp(1.45rem, 2vw, 2.1rem);
+      line-height: 1.05;
+    }
+
+    .panel-copy {
+      margin: 8px 0 0;
+      max-width: 64ch;
+    }
+
+    .clip-panel .panel-copy,
+    .clip-panel .tag,
+    .clip-panel .transcript-line small,
+    .clip-panel .subtitle-note,
+    .stage-label,
+    #clipPlaybackStatus {
+      color: rgba(239, 246, 255, 0.76);
+    }
+
+    .tag,
+    .mini-tag {
+      padding: 8px 12px;
+      background: rgba(23, 23, 23, 0.06);
+      border: 1px solid rgba(23, 23, 23, 0.08);
+      color: var(--ink-soft);
+      font-size: 0.82rem;
+    }
+
+    .clip-panel .tag {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.12);
+    }
+
+    .mini-tag {
+      padding: 6px 10px;
+      font-size: 0.74rem;
+    }
+
+    .mission-grid,
+    .focus-grid,
+    .progress-grid {
+      display: grid;
+      gap: 12px;
+    }
+
+    .mission-grid,
+    .focus-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .mission-grid {
+      margin-top: 16px;
+    }
+
+    .free-speaking-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(320px, 0.9fr);
+      gap: 16px;
+      align-items: start;
+      margin-top: 18px;
+    }
+
+    .mission-step,
+    .focus-tip,
+    .history-card,
+    .weak-card,
+    .chunk-card,
+    .focus-card,
+    .fluency-card,
+    .reflection-box,
+    .target-phrase,
+    .pron-result,
+    .timer-stage {
+      padding: 16px;
+      border-radius: var(--radius-md);
+      background: rgba(255, 255, 255, 0.76);
+      border: 1px solid rgba(23, 23, 23, 0.08);
+    }
+
+    .mission-step.is-done {
+      background: rgba(236, 253, 245, 0.88);
+      border-color: rgba(15, 118, 110, 0.22);
+    }
+
+    .free-speaking-brief {
+      display: grid;
+      gap: 14px;
+      align-content: start;
+    }
+
+    .free-speaking-copy {
+      max-width: 68ch;
+    }
+
+    .free-speaking-note {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .free-speaking-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 4px;
+    }
+
+    .free-speaking-card {
+      display: grid;
+      gap: 14px;
+    }
+
+    .free-speaking-card .prompt-title {
+      font-size: 1.18rem;
+    }
+
+    .mission-step-title {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 6px;
+      font-weight: 700;
+    }
+
+    .step-status.done { color: var(--teal); }
+    .step-status.live { color: var(--ember-deep); }
+
+    .mission-quote { margin-top: 16px; border-style: dashed; }
+
+    .video-stage {
+      position: relative;
+      min-height: 320px;
+      border-radius: 24px;
+      padding: 22px;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 25% 20%, rgba(239, 68, 68, 0.22), transparent 30%),
+        radial-gradient(circle at 72% 26%, rgba(45, 212, 191, 0.22), transparent 30%),
+        linear-gradient(160deg, rgba(15, 23, 42, 0.95), rgba(17, 24, 39, 0.98));
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.03);
+    }
+
+    .video-stage::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.03), transparent 28%),
+        repeating-linear-gradient(180deg, rgba(255, 255, 255, 0.025), rgba(255, 255, 255, 0.025) 2px, transparent 2px, transparent 12px);
+      opacity: 0.42;
+      pointer-events: none;
+    }
+
+    .live-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #fb7185;
+      box-shadow: 0 0 0 0 rgba(251, 113, 133, 0.6);
+      animation: pulse-dot 2s infinite;
+    }
+
+    @keyframes pulse-dot {
+      0% { box-shadow: 0 0 0 0 rgba(251, 113, 133, 0.5); }
+      70% { box-shadow: 0 0 0 12px rgba(251, 113, 133, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(251, 113, 133, 0); }
+    }
+
+    .stage-main {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: 220px 1fr;
+      gap: 24px;
+      align-items: center;
+    }
+
+    .coach-shell {
+      position: relative;
+      height: 230px;
+      display: grid;
+      place-items: center;
+    }
+
+    .coach-aura {
+      position: absolute;
+      width: 170px;
+      height: 170px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(45, 212, 191, 0.42), rgba(45, 212, 191, 0.02) 72%);
+      filter: blur(10px);
+      animation: slow-spin 18s linear infinite;
+    }
+
+    .coach-bust {
+      position: relative;
+      width: 150px;
+      height: 150px;
+      border-radius: 44% 56% 48% 52% / 46% 48% 52% 54%;
+      background: linear-gradient(180deg, #fde68a, #fbbf24);
+      box-shadow: 0 18px 36px rgba(0, 0, 0, 0.24);
+      overflow: hidden;
+    }
+
+    .coach-bust::before {
+      content: "";
+      position: absolute;
+      inset: 18px 22px 46px;
+      border-radius: 42% 58% 44% 56% / 48% 43% 57% 52%;
+      background:
+        radial-gradient(circle at 32% 40%, #1f2937 0 6px, transparent 7px),
+        radial-gradient(circle at 68% 40%, #1f2937 0 6px, transparent 7px),
+        linear-gradient(180deg, #fef3c7, #fde68a);
+    }
+
+    .coach-mouth {
+      position: absolute;
+      left: 50%;
+      bottom: 34px;
+      width: 32px;
+      height: 12px;
+      transform: translateX(-50%);
+      border-radius: 0 0 20px 20px;
+      background: #7c2d12;
+      transition: height 120ms ease, transform 120ms ease;
+    }
+
+    .video-stage.is-speaking .coach-mouth {
+      height: 28px;
+      transform: translateX(-50%) scaleY(1.1);
+    }
+
+    .coach-shoulders {
+      position: absolute;
+      bottom: 16px;
+      width: 190px;
+      height: 68px;
+      border-radius: 36px 36px 20px 20px;
+      background: linear-gradient(180deg, rgba(239, 68, 68, 0.9), rgba(157, 23, 77, 0.86));
+      box-shadow: 0 22px 30px rgba(0, 0, 0, 0.24);
+    }
+
+    .subtitle-wrap {
+      display: grid;
+      gap: 14px;
+    }
+
+    .subtitle-text {
+      min-height: 118px;
+      padding: 20px 22px;
+      border-radius: 24px;
+      background:
+        linear-gradient(90deg, rgba(251, 191, 36, 0.32), rgba(251, 191, 36, 0.14)),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.08));
+      background-size: 0% 100%, 100% 100%;
+      background-repeat: no-repeat;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      font-family: Georgia, "Palatino Linotype", serif;
+      font-size: clamp(1.3rem, 2vw, 2rem);
+      line-height: 1.2;
+      letter-spacing: -0.03em;
+      display: flex;
+      align-items: flex-end;
+    }
+
+    .subtitle-text.is-speaking-line {
+      animation: phrase-fill var(--speak-duration, 2200ms) linear forwards;
+    }
+
+    .wave-grid {
+      display: grid;
+      grid-template-columns: repeat(18, 1fr);
+      gap: 6px;
+      align-items: end;
+      height: 52px;
+      margin-top: 10px;
+    }
+
+    .wave-bar {
+      border-radius: 999px;
+      background: linear-gradient(180deg, #67e8f9, #fb7185);
+      height: calc(10px + (var(--bar) * 3px));
+      opacity: 0.78;
+      animation: equalize 1.2s ease-in-out infinite;
+      animation-delay: calc(var(--delay) * 90ms);
+    }
+
+    @keyframes equalize {
+      0%, 100% { transform: scaleY(0.56); opacity: 0.52; }
+      50% { transform: scaleY(1.08); opacity: 1; }
+    }
+
+    @keyframes slow-spin {
+      from { transform: rotate(0deg) scale(1); }
+      50% { transform: rotate(180deg) scale(1.05); }
+      to { transform: rotate(360deg) scale(1); }
+    }
+
+    .transcript-list,
+    .chunk-list,
+    .history-list,
+    .weak-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .transcript-list {
+      margin-top: 18px;
+    }
+
+    .transcript-line {
+      width: 100%;
+      text-align: left;
+      padding: 13px 16px;
+      border-radius: 18px;
+      background:
+        linear-gradient(90deg, rgba(251, 191, 36, 0.26), rgba(251, 191, 36, 0.12)),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.06));
+      background-size: 0% 100%, 100% 100%;
+      background-repeat: no-repeat;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: #eff6ff;
+    }
+
+    .transcript-line.is-active {
+      background:
+        linear-gradient(90deg, rgba(251, 191, 36, 0.22), rgba(251, 191, 36, 0.1)),
+        linear-gradient(180deg, rgba(251, 191, 36, 0.18), rgba(251, 191, 36, 0.18));
+      background-size: 0% 100%, 100% 100%;
+      border-color: rgba(251, 191, 36, 0.3);
+    }
+
+    .transcript-line.is-speaking-line {
+      animation: phrase-fill var(--speak-duration, 2200ms) linear forwards;
+      border-color: rgba(251, 191, 36, 0.4);
+    }
+
+    .chunk-tools,
+    .session-phrase-tools {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .chunk-play-button {
+      padding: 9px 12px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, rgba(29, 78, 216, 0.12), rgba(15, 118, 110, 0.14));
+      border: 1px solid rgba(29, 78, 216, 0.16);
+      color: var(--ink);
+      font-size: 0.8rem;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .chunk-play-button:hover {
+      box-shadow: 0 12px 24px rgba(29, 78, 216, 0.14);
+    }
+
+    .chunk-check-button {
+      padding: 9px 12px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, rgba(15, 118, 110, 0.12), rgba(132, 204, 22, 0.14));
+      border: 1px solid rgba(15, 118, 110, 0.18);
+      color: var(--ink);
+      font-size: 0.8rem;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .chunk-check-button:hover {
+      box-shadow: 0 12px 24px rgba(15, 118, 110, 0.12);
+    }
+
+    .chunk-check-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 12px;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      border: 1px solid rgba(23, 23, 23, 0.08);
+      background: rgba(255, 255, 255, 0.76);
+      color: var(--ink-soft);
+    }
+
+    .chunk-check-badge.is-pass {
+      background: rgba(236, 253, 245, 0.94);
+      border-color: rgba(15, 118, 110, 0.2);
+      color: var(--teal);
+    }
+
+    .chunk-check-badge.is-warn {
+      background: rgba(255, 247, 237, 0.94);
+      border-color: rgba(216, 91, 45, 0.18);
+      color: var(--ember-deep);
+    }
+
+    .chunk-check-note {
+      margin-top: 10px;
+      font-size: 0.92rem;
+      line-height: 1.5;
+      color: var(--ink-soft);
+    }
+
+    .chunk-card.is-again,
+    .session-phrase-item.is-again {
+      background: linear-gradient(180deg, rgba(255, 248, 245, 0.94), rgba(255, 243, 239, 0.88));
+      border-color: rgba(216, 91, 45, 0.16);
+    }
+
+    .chunk-card.is-almost,
+    .session-phrase-item.is-almost {
+      background: linear-gradient(180deg, rgba(255, 252, 233, 0.96), rgba(252, 244, 206, 0.88));
+      border-color: rgba(202, 138, 4, 0.18);
+    }
+
+    .chunk-card.is-automatic,
+    .session-phrase-item.is-automatic {
+      background: linear-gradient(180deg, rgba(240, 253, 244, 0.96), rgba(220, 252, 231, 0.9));
+      border-color: rgba(22, 163, 74, 0.2);
+      box-shadow: 0 14px 32px rgba(22, 163, 74, 0.08);
+    }
+
+    .chunk-card.is-check-pass,
+    .session-phrase-item.is-check-pass {
+      box-shadow: 0 0 0 2px rgba(15, 118, 110, 0.12), 0 16px 30px rgba(15, 118, 110, 0.08);
+    }
+
+    .chunk-card.is-check-warn,
+    .session-phrase-item.is-check-warn {
+      box-shadow: 0 0 0 2px rgba(216, 91, 45, 0.08);
+    }
+
+    .chip-button {
+      padding: 10px 14px;
+      background: rgba(255, 255, 255, 0.92);
+      border: 1px solid rgba(23, 23, 23, 0.08);
+      color: var(--ink-soft);
+      font-size: 0.9rem;
+      font-weight: 800;
+    }
+
+    .chip-button.active {
+      color: #fff;
+      box-shadow: 0 12px 26px rgba(15, 23, 42, 0.12);
+    }
+
+    .chip-button.tone-again.active {
+      background: linear-gradient(135deg, #dc2626, #f97316);
+    }
+
+    .chip-button.tone-almost.active {
+      background: linear-gradient(135deg, #ca8a04, #facc15);
+      color: #111827;
+    }
+
+    .chip-button.tone-automatic.active {
+      background: linear-gradient(135deg, #059669, #22c55e);
+    }
+
+    .chunk-text-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 4px;
+    }
+
+    .chunk-primary-tools {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 8px;
+    }
+
+    .chunk-side-status {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 8px;
+    }
+
+    @keyframes phrase-fill {
+      from {
+        background-size: 0% 100%, 100% 100%;
+      }
+      to {
+        background-size: 100% 100%, 100% 100%;
+      }
+    }
+
+    .progress-grid {
+      grid-template-columns: 1.05fr 0.95fr 1fr;
+    }
+
+    .timer-stage {
+      background: linear-gradient(145deg, rgba(255, 255, 255, 0.9), rgba(233, 244, 213, 0.72));
+      border-color: rgba(77, 124, 15, 0.12);
+    }
+
+    .timer-value,
+    .chunk-text,
+    .target-phrase span,
+    .prompt-title {
+      font-family: Georgia, "Palatino Linotype", serif;
+    }
+
+    .timer-value {
+      font-size: clamp(2.4rem, 4vw, 3.4rem);
+      line-height: 1;
+      letter-spacing: -0.05em;
+    }
+
+    .timer-bar {
+      height: 12px;
+      margin-top: 14px;
+      border-radius: 999px;
+      background: rgba(77, 124, 15, 0.12);
+      overflow: hidden;
+    }
+
+    .timer-fill {
+      height: 100%;
+      width: 0%;
+      border-radius: 999px;
+      background: linear-gradient(135deg, #84cc16, #14b8a6);
+      transition: width 180ms linear;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 150px;
+      resize: vertical;
+      border-radius: 18px;
+      border: 1px solid rgba(23, 23, 23, 0.1);
+      padding: 14px 16px;
+      font: inherit;
+      color: var(--ink);
+      background: rgba(255, 255, 255, 0.9);
+    }
+
+    .audio-player {
+      width: 100%;
+      margin-top: 12px;
+    }
+
+    body.session-open {
+      overflow: hidden;
+    }
+
+    .session-overlay[hidden] {
+      display: none;
+    }
+
+    .session-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 40;
+      display: grid;
+      place-items: center;
+      padding: 18px;
+      background:
+        linear-gradient(180deg, rgba(15, 23, 42, 0.52), rgba(17, 24, 39, 0.78)),
+        radial-gradient(circle at top left, rgba(216, 91, 45, 0.18), transparent 24%),
+        radial-gradient(circle at 80% 18%, rgba(15, 118, 110, 0.18), transparent 24%);
+      backdrop-filter: blur(18px);
+    }
+
+    .session-shell {
+      width: min(980px, 100%);
+      max-height: min(92vh, 980px);
+      overflow: auto;
+      border-radius: 34px;
+      background:
+        linear-gradient(180deg, rgba(255, 249, 240, 0.98), rgba(251, 243, 231, 0.96));
+      border: 1px solid rgba(255, 255, 255, 0.68);
+      box-shadow: 0 34px 100px rgba(15, 23, 42, 0.34);
+    }
+
+    .session-header,
+    .session-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 14px;
+      padding: 18px 22px;
+    }
+
+    .session-header {
+      border-bottom: 1px solid rgba(23, 23, 23, 0.08);
+    }
+
+    .session-footer {
+      border-top: 1px solid rgba(23, 23, 23, 0.08);
+      position: sticky;
+      bottom: 0;
+      background: rgba(255, 250, 243, 0.94);
+      backdrop-filter: blur(10px);
+    }
+
+    .session-body {
+      padding: 22px;
+      display: grid;
+      gap: 18px;
+    }
+
+    .session-kicker {
+      margin: 0 0 6px;
+      font-size: 0.78rem;
+      font-weight: 800;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--ember-deep);
+    }
+
+    .session-title {
+      font-size: clamp(1.8rem, 3vw, 2.8rem);
+      line-height: 1;
+    }
+
+    .session-lead {
+      margin: 0;
+      color: var(--ink-soft);
+      line-height: 1.6;
+      max-width: 70ch;
+    }
+
+    .session-track {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-top: 8px;
+    }
+
+    .session-step-pill {
+      padding: 12px 14px;
+      border-radius: 18px;
+      background: rgba(23, 23, 23, 0.05);
+      border: 1px solid rgba(23, 23, 23, 0.08);
+      min-height: 78px;
+    }
+
+    .session-step-pill.active {
+      background: linear-gradient(135deg, rgba(216, 91, 45, 0.14), rgba(239, 127, 82, 0.14));
+      border-color: rgba(216, 91, 45, 0.24);
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.45);
+    }
+
+    .session-step-pill.done {
+      background: rgba(236, 253, 245, 0.88);
+      border-color: rgba(15, 118, 110, 0.22);
+    }
+
+    .session-step-pill strong {
+      display: block;
+      font-size: 0.78rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+      color: var(--ink-soft);
+    }
+
+    .session-step-pill span {
+      display: block;
+      font-weight: 700;
+      line-height: 1.35;
+    }
+
+    .session-panel {
+      padding: 18px;
+      border-radius: 26px;
+      background: rgba(255, 255, 255, 0.74);
+      border: 1px solid rgba(23, 23, 23, 0.08);
+      display: grid;
+      gap: 16px;
+    }
+
+    .session-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    .session-card {
+      padding: 14px;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.8);
+      border: 1px solid rgba(23, 23, 23, 0.08);
+    }
+
+    .session-card strong {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 0.82rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--ember-deep);
+    }
+
+    .session-checklist {
+      display: grid;
+      gap: 10px;
+    }
+
+    .session-check {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 12px 14px;
+      border-radius: 16px;
+      background: rgba(23, 23, 23, 0.04);
+      border: 1px solid rgba(23, 23, 23, 0.06);
+    }
+
+    .session-check-dot {
+      width: 14px;
+      height: 14px;
+      margin-top: 4px;
+      border-radius: 50%;
+      background: rgba(23, 23, 23, 0.18);
+      flex: 0 0 auto;
+    }
+
+    .session-check.is-done .session-check-dot {
+      background: var(--teal);
+      box-shadow: 0 0 0 4px rgba(15, 118, 110, 0.12);
+    }
+
+    .session-phrase-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .session-phrase-item {
+      padding: 14px 16px;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.82);
+      border: 1px solid rgba(23, 23, 23, 0.08);
+    }
+
+    .session-phrase-item h4 {
+      margin: 0 0 6px;
+      font-family: Georgia, "Palatino Linotype", serif;
+      font-size: 1.1rem;
+      line-height: 1.15;
+    }
+
+    .session-phrase-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 14px;
+    }
+
+    .session-target-line {
+      padding: 18px;
+      border-radius: 24px;
+      background: linear-gradient(140deg, rgba(15, 23, 42, 0.96), rgba(29, 38, 62, 0.92));
+      color: #eff6ff;
+      font-family: Georgia, "Palatino Linotype", serif;
+      font-size: clamp(1.2rem, 2vw, 1.8rem);
+      line-height: 1.25;
+    }
+
+    .session-mic-result {
+      padding: 16px;
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.84);
+      border: 1px solid rgba(23, 23, 23, 0.08);
+    }
+
+    .session-mic-result.is-pass {
+      background: rgba(236, 253, 245, 0.9);
+      border-color: rgba(15, 118, 110, 0.24);
+    }
+
+    .session-mic-result.is-warn {
+      background: rgba(255, 247, 237, 0.92);
+      border-color: rgba(216, 91, 45, 0.2);
+    }
+
+    .session-actions-inline {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .session-footer-actions {
+      display: flex;
+      gap: 10px;
+      margin-left: auto;
+    }
+
+    @media (max-width: 1180px) {
+      .hero,
+      .free-speaking-grid,
+      .dashboard,
+      .progress-grid,
+      .stage-main,
+      .mission-grid,
+      .focus-grid,
+      .session-grid,
+      .session-track {
+        grid-template-columns: 1fr;
+      }
+
+      .clip-panel,
+      .progress-panel,
+      .fluency-panel,
+      .pron-panel,
+      .chunk-panel,
+      .mission-panel {
+        grid-column: auto;
+      }
+    }
+
+    @media (max-width: 760px) {
+      .app-shell {
+        width: min(100% - 18px, 1440px);
+        padding-top: 12px;
+      }
+
+      .hero-copy,
+      .panel {
+        padding: 18px;
+      }
+
+      .hero-stats {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .subtitle-text {
+        min-height: 92px;
+        font-size: 1.22rem;
+      }
+
+      .chunk-head,
+      .session-phrase-top {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .chunk-tools,
+      .session-phrase-tools {
+        justify-content: flex-start;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="hero">
+      <section class="hero-card hero-copy">
+        <div>
+          <p class="eyebrow">Autonomous Speaking Trainer</p>
+          <h1>Speaking Lab</h1>
+          <p class="hero-lead">
+            A daily speaking gym built for fluency, rhythm, and pronunciation. No wandering around the internet.
+            Open the page, run the mission, copy the coach, speak out loud, and let the app rotate your material for the next day.
+          </p>
+          <div class="hero-meta" id="heroMeta"></div>
+        </div>
+        <div>
+          <div class="hero-actions">
+            <button class="button-primary" id="startSessionBtn">Start Today's Mission</button>
+            <button class="button-secondary" id="playTodayBtn">Play Coach Clip</button>
+            <button class="button-ghost" id="rerollBtn">Reroll Today</button>
+          </div>
+          <div class="footer-note" id="daySummary"></div>
+        </div>
+      </section>
+
+      <section class="hero-card hero-stats" id="heroStats"></section>
+    </header>
+
+    <section class="panel free-speaking-panel focus-strip" id="freeSpeakingPanel">
+      <div class="panel-header">
+        <div class="panel-title-block">
+          <p class="panel-kicker">Free Speaking</p>
+          <h2 class="panel-title" id="freeSpeakingTitle"></h2>
+          <p class="panel-copy free-speaking-copy" id="freeSpeakingCopy"></p>
+        </div>
+        <span class="tag" id="freeSpeakingTag">Standalone</span>
+      </div>
+
+      <div class="free-speaking-grid">
+        <div class="free-speaking-brief">
+          <div class="fluency-card free-speaking-card">
+            <div class="prompt-title" id="freeSpeakingPromptTitle"></div>
+            <p class="fluency-note" id="freeSpeakingPromptLead"></p>
+            <ul class="prompt-list" id="freeSpeakingPromptList"></ul>
+          </div>
+          <div class="free-speaking-note">
+            <span class="mini-tag">Just speak. No mission lock.</span>
+            <span class="mini-tag" id="freeSpeakingStatus">Ready for a standalone fluency round.</span>
+          </div>
+        </div>
+
+        <div class="fluency-card">
+          <div class="timer-stage">
+            <div class="timer-label" id="freeTimerLabel">Ready</div>
+            <div class="timer-value" id="freeTimerValue">04:00</div>
+            <div class="timer-bar">
+              <div class="timer-fill" id="freeTimerFill"></div>
+            </div>
+          </div>
+
+          <div class="free-speaking-actions">
+            <button class="button-primary" id="runFreeSpeakingBtn">Start Free Speaking</button>
+            <button class="button-secondary" id="newFreeTopicBtn">New Topic</button>
+            <button class="button-ghost" id="skipFreeSpeakingStageBtn">Skip Stage</button>
+            <button class="button-ghost" id="stopFreeSpeakingBtn">Stop</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <main class="dashboard">
+      <section class="panel mission-panel" id="missionPanel">
+        <div class="panel-header">
+          <div class="panel-title-block">
+            <p class="panel-kicker">Daily Mission</p>
+            <h2 class="panel-title">Today's speaking route</h2>
+            <p class="panel-copy" id="missionIntro"></p>
+          </div>
+          <span class="tag" id="missionDateTag"></span>
+        </div>
+        <div class="mission-grid" id="missionSteps"></div>
+        <div class="mission-quote" id="missionQuote"></div>
+      </section>
+
+      <section class="panel clip-panel" id="clipPanel">
+        <div class="panel-header">
+          <div class="panel-title-block">
+            <p class="panel-kicker">Coach Clip</p>
+            <h2 class="panel-title" id="clipTitle"></h2>
+            <p class="panel-copy" id="clipScene"></p>
+          </div>
+          <span class="tag" id="clipFocusTag"></span>
+        </div>
+
+        <div class="video-stage" id="videoStage">
+          <div class="stage-topline">
+            <span class="stage-label">Internal Coach Reel</span>
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span class="stage-label" id="clipPlaybackStatus">Ready</span>
+              <span class="live-dot"></span>
+            </div>
+          </div>
+
+          <div class="stage-main">
+            <div class="coach-shell">
+              <div class="coach-aura"></div>
+              <div class="coach-shoulders"></div>
+              <div class="coach-bust">
+                <div class="coach-mouth"></div>
+              </div>
+            </div>
+
+            <div class="subtitle-wrap">
+              <div class="subtitle-text" id="clipSubtitle">Press play and mirror the coach line by line.</div>
+              <div class="subtitle-note" id="clipNote"></div>
+              <div class="wave-grid" id="waveGrid"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="clip-controls">
+          <button class="button-primary" id="playClipBtn">Play Clip</button>
+          <button class="button-secondary" id="shadowBtn">Shadow Mode</button>
+          <button class="button-ghost" id="stopClipBtn">Stop</button>
+          <button class="button-ghost" id="clipDoneBtn">Mark Shadowing Done</button>
+        </div>
+
+        <div class="transcript-list" id="transcriptList"></div>
+      </section>
+
+      <section class="panel chunk-panel" id="chunkPanel">
+        <div class="panel-header">
+          <div class="panel-title-block">
+            <p class="panel-kicker">Warm-Up Chunks</p>
+            <h2 class="panel-title">Automatic phrases for today</h2>
+            <p class="panel-copy">
+              These are the fillers, pivots, and opinion patterns you should overlearn until they come out without translation.
+            </p>
+          </div>
+          <span class="tag" id="chunkTag"></span>
+        </div>
+
+        <div class="chunk-list" id="chunkList"></div>
+
+        <div class="chunk-actions">
+          <button class="button-ghost" id="moreWarmupBtn">More</button>
+          <button class="button-primary" id="chunksDoneBtn">Warm-Up Done</button>
+        </div>
+      </section>
+
+      <section class="panel pron-panel" id="pronPanel">
+        <div class="panel-header">
+          <div class="panel-title-block">
+            <p class="panel-kicker">Pronunciation Lab</p>
+            <h2 class="panel-title" id="pronFocusTitle"></h2>
+            <p class="panel-copy" id="pronFocusCopy"></p>
+          </div>
+          <span class="tag" id="pronSupportTag"></span>
+        </div>
+
+        <div class="focus-card">
+          <div class="target-phrase">
+            <strong>Target Phrase</strong>
+            <span id="pronTargetPhrase"></span>
+          </div>
+
+          <div class="target-phrase" style="margin-top:12px;">
+            <strong>Anchor Sound Drill</strong>
+            <span id="pronAnchorPhrase"></span>
+          </div>
+
+          <div class="focus-grid" id="pronTips"></div>
+          <div class="drill-chips" id="pronDrills"></div>
+
+          <div class="pron-controls">
+            <button class="button-secondary" id="playTargetBtn">Play Target</button>
+            <button class="button-ghost" id="playAnchorBtn">Play Anchor</button>
+            <button class="button-primary" id="checkPronBtn">Check Pronunciation</button>
+            <button class="button-ghost" id="recordSelfBtn">Record Myself</button>
+            <button class="button-ghost" id="pronDoneBtn">Pronunciation Done</button>
+          </div>
+
+          <div class="pron-result" id="pronResult">
+            <div class="pron-status">No pronunciation attempt yet.</div>
+            <p class="pron-note">
+              Use browser speech check for an instant approximation, or record yourself and compare with the coach.
+            </p>
+            <audio class="audio-player" id="selfPlayback" controls style="display:none;"></audio>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel fluency-panel" id="fluencyPanel">
+        <div class="panel-header">
+          <div class="panel-title-block">
+            <p class="panel-kicker">Fluency Drill</p>
+            <h2 class="panel-title" id="fluencyTitle"></h2>
+            <p class="panel-copy" id="fluencyCopy"></p>
+          </div>
+          <span class="tag">4-3-2 Ladder</span>
+        </div>
+
+        <div class="fluency-card">
+          <div class="prompt-title" id="fluencyPromptTitle"></div>
+          <p class="fluency-note" id="fluencyPromptLead"></p>
+          <ul class="prompt-list" id="fluencyPromptList"></ul>
+
+          <div class="timer-stage">
+            <div class="timer-label" id="timerLabel">Ready</div>
+            <div class="timer-value" id="timerValue">04:00</div>
+            <div class="timer-bar">
+              <div class="timer-fill" id="timerFill"></div>
+            </div>
+          </div>
+
+          <div class="fluency-controls">
+            <button class="button-primary" id="runFluencyBtn">Run 4-3-2</button>
+            <button class="button-ghost" id="nextStageBtn">Skip Stage</button>
+            <button class="button-ghost" id="stopTimerBtn">Stop Timer</button>
+            <button class="button-secondary" id="fluencyDoneBtn">Fluency Done</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel progress-panel" id="progressPanel">
+        <div class="panel-header">
+          <div class="panel-title-block">
+            <p class="panel-kicker">Progress Memory</p>
+            <h2 class="panel-title">What the app remembers about you</h2>
+            <p class="panel-copy">
+              Your streak, mastered chunks, weak pronunciation zones, daily missions, and notes all stay in local storage so tomorrow does not reset today.
+            </p>
+          </div>
+          <span class="tag" id="levelTag"></span>
+        </div>
+
+        <div class="progress-grid">
+          <div>
+            <h3 style="margin-bottom:12px;">Recent Sessions</h3>
+            <div class="history-list" id="historyList"></div>
+          </div>
+
+          <div>
+            <h3 style="margin-bottom:12px;">Weak Zones</h3>
+            <div class="weak-list" id="weakList"></div>
+          </div>
+
+          <div class="reflection-box">
+            <h3 style="margin-bottom:12px;">Daily Reflection</h3>
+            <textarea id="reflectionInput" placeholder="What felt sticky today? Which phrase do you want automatic tomorrow?"></textarea>
+            <div class="reflection-actions">
+              <button class="button-primary" id="saveReflectionBtn">Save Reflection</button>
+              <button class="button-ghost is-danger" id="resetProgressBtn">Reset All Memory</button>
+            </div>
+            <div class="status-line" id="reflectionStatus"></div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div class="session-overlay" id="sessionOverlay" hidden>
+    <div class="session-shell" role="dialog" aria-modal="true" aria-labelledby="sessionTitleText">
+      <div class="session-header">
+        <div>
+          <p class="session-kicker">Today's Mission Flow</p>
+          <h2 class="session-title" id="sessionTitleText">Guided session</h2>
+        </div>
+        <button class="button-ghost" id="closeSessionBtn">Close</button>
+      </div>
+
+      <div class="session-body">
+        <div class="session-track" id="sessionTrack"></div>
+        <div>
+          <p class="session-kicker" id="sessionStepKicker">Step 1</p>
+          <h3 class="panel-title" id="sessionStepTitle">Warm up</h3>
+          <p class="session-lead" id="sessionStepLead"></p>
+        </div>
+        <div id="sessionStepBody"></div>
+      </div>
+
+      <div class="session-footer">
+        <div class="status-line" id="sessionStatus">Follow the steps in order.</div>
+        <div class="session-footer-actions">
+          <button class="button-ghost" id="sessionBackBtn">Back</button>
+          <button class="button-primary" id="sessionNextBtn">Next</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const APP_DATA = {
+      chunks: [
+        { id: "chunk-001", text: "I mean", note: "Use it to buy half a second and stay natural.", lane: "filler" },
+        { id: "chunk-002", text: "the thing is", note: "Launch your real point without sounding abrupt.", lane: "pivot" },
+        { id: "chunk-003", text: "to be honest", note: "Opens a direct opinion smoothly.", lane: "opinion" },
+        { id: "chunk-004", text: "at the end of the day", note: "Good for summarizing your main conclusion.", lane: "summary" },
+        { id: "chunk-005", text: "I ended up", note: "Perfect for telling short stories about what finally happened.", lane: "story" },
+        { id: "chunk-006", text: "it turns out", note: "Use when the result surprised you.", lane: "story" },
+        { id: "chunk-007", text: "for a second", note: "Useful in stories about quick reactions.", lane: "story" },
+        { id: "chunk-008", text: "I was about to", note: "Makes your stories more dynamic.", lane: "story" },
+        { id: "chunk-009", text: "kind of", note: "Softens your statement the way natives often do.", lane: "softener" },
+        { id: "chunk-010", text: "sort of", note: "Another softener that makes speech less rigid.", lane: "softener" },
+        { id: "chunk-011", text: "it depends on", note: "A reliable answer frame when the topic is nuanced.", lane: "opinion" },
+        { id: "chunk-012", text: "from my point of view", note: "A formal but useful opinion opener.", lane: "opinion" },
+        { id: "chunk-013", text: "what I mean is", note: "Great for repairing a sentence without panic.", lane: "repair" },
+        { id: "chunk-014", text: "what I’m trying to say is", note: "Gives you time to reformulate while sounding fluent.", lane: "repair" },
+        { id: "chunk-015", text: "if that makes sense", note: "Soft landing after a longer thought.", lane: "repair" },
+        { id: "chunk-016", text: "to some extent", note: "Very useful when you agree only partly.", lane: "opinion" },
+        { id: "chunk-017", text: "for the most part", note: "A natural way to say mostly.", lane: "summary" },
+        { id: "chunk-018", text: "in the first place", note: "Useful for explaining motives or causes.", lane: "reason" },
+        { id: "chunk-019", text: "on top of that", note: "A strong connector for adding one more point.", lane: "linker" },
+        { id: "chunk-020", text: "on the other hand", note: "Your go-to contrast frame.", lane: "linker" },
+        { id: "chunk-021", text: "that being said", note: "Elegant transition into contrast or nuance.", lane: "linker" },
+        { id: "chunk-022", text: "in other words", note: "Lets you restate something more clearly.", lane: "repair" },
+        { id: "chunk-023", text: "as far as I know", note: "Useful when you want to sound careful, not absolute.", lane: "softener" },
+        { id: "chunk-024", text: "from what I’ve seen", note: "A natural evidence phrase.", lane: "evidence" },
+        { id: "chunk-025", text: "I’m not really into", note: "Fast pattern for dislikes and preferences.", lane: "preference" },
+        { id: "chunk-026", text: "I’m really into", note: "Fast pattern for likes and hobbies.", lane: "preference" },
+        { id: "chunk-027", text: "I’m still figuring out", note: "Excellent for uncertainty without freezing.", lane: "repair" },
+        { id: "chunk-028", text: "I wouldn’t say that", note: "Soft disagreement.", lane: "disagreement" },
+        { id: "chunk-029", text: "I can see why", note: "Shows partial agreement before disagreement.", lane: "disagreement" },
+        { id: "chunk-030", text: "fair enough", note: "Short natural response when the other side has a point.", lane: "response" },
+        { id: "chunk-031", text: "that’s a good point", note: "Quick natural reaction in conversation.", lane: "response" },
+        { id: "chunk-032", text: "I guess", note: "Useful when you want a softer answer.", lane: "softener" },
+        { id: "chunk-033", text: "I’d say", note: "The simplest natural opinion opener.", lane: "opinion" },
+        { id: "chunk-034", text: "to me", note: "Short, fast opinion frame.", lane: "opinion" },
+        { id: "chunk-035", text: "the main reason is", note: "Very useful for structured answers.", lane: "reason" },
+        { id: "chunk-036", text: "what happened was", note: "A story-launching phrase that reduces hesitation.", lane: "story" },
+        { id: "chunk-037", text: "long story short", note: "Summary phrase that sounds very natural.", lane: "summary" },
+        { id: "chunk-038", text: "next thing I knew", note: "Excellent for fast storytelling.", lane: "story" },
+        { id: "chunk-039", text: "at first", note: "Keep time order simple and natural.", lane: "story" },
+        { id: "chunk-040", text: "after a while", note: "Great for narrative rhythm.", lane: "story" },
+        { id: "chunk-041", text: "all of a sudden", note: "Adds energy to stories.", lane: "story" },
+        { id: "chunk-042", text: "for some reason", note: "Natural filler when the cause is unclear.", lane: "story" },
+        { id: "chunk-043", text: "as a result", note: "Clear cause and effect connector.", lane: "linker" },
+        { id: "chunk-044", text: "that’s why", note: "Simple spoken connector for explanation.", lane: "linker" },
+        { id: "chunk-045", text: "I’m used to", note: "Very useful everyday grammar pattern.", lane: "pattern" },
+        { id: "chunk-046", text: "I’m not used to", note: "Another high-frequency pattern worth automating.", lane: "pattern" },
+        { id: "chunk-047", text: "the way I see it", note: "Strong conversational opinion frame.", lane: "opinion" },
+        { id: "chunk-048", text: "now that I think about it", note: "Buys time without sounding empty.", lane: "repair" }
+      ],
+      pronunciation: {
+        "th-clear": { id: "th-clear", title: "Clear th as in think", summary: "Aim for a soft breathy sound, not s and not t.", anchor: "I think three things matter most.", tips: [{ label: "Tongue", value: "Let the tongue tip rest lightly between the teeth." }, { label: "Air", value: "Push a thin stream of air over the tongue." }, { label: "Jaw", value: "Keep it loose. Do not clamp the mouth shut." }, { label: "Trap", value: "Do not replace it with s, z, or t." }], drills: ["think", "three", "through", "method", "nothing"], coach: "The tongue should peek out slightly. If it stays behind the teeth, the sound usually turns into s or t." },
+        "th-voiced": { id: "th-voiced", title: "Voiced th as in this", summary: "Use the same tongue position as think, but add voice.", anchor: "This is the way they do it there.", tips: [{ label: "Tongue", value: "Tongue tip lightly between the teeth again." }, { label: "Voice", value: "Turn the voice on. You should feel vibration." }, { label: "Flow", value: "Keep it gentle. Do not punch it like d." }, { label: "Trap", value: "Avoid replacing it with d or z." }], drills: ["this", "that", "them", "those", "there"], coach: "If the sound feels dead and hard, you are probably saying d instead of voiced th." },
+        "r-sound": { id: "r-sound", title: "American r without rolling", summary: "Pull the tongue slightly back and keep it off the roof of the mouth.", anchor: "I really care about clear results.", tips: [{ label: "Tongue", value: "Pull it slightly back. It should not tap anything." }, { label: "Lips", value: "Round them a little, but keep the face relaxed." }, { label: "Voice", value: "Make the sound smooth, not harsh." }, { label: "Trap", value: "Do not trill or flap it like in Russian." }], drills: ["really", "right", "around", "carry", "green"], coach: "Think of the r as a shaped tunnel, not a rolled consonant." },
+        "w-v": { id: "w-v", title: "Separating w and v", summary: "English w uses rounded lips; v uses top teeth on lower lip.", anchor: "We were very worried at first.", tips: [{ label: "W", value: "Round the lips and glide into the vowel." }, { label: "V", value: "Top teeth touch the lower lip and add voice." }, { label: "Contrast", value: "Say west and vest slowly to feel the difference." }, { label: "Trap", value: "Do not turn every w into v." }], drills: ["west vest", "wine vine", "wheel veal", "wary very"], coach: "W has no teeth contact. V always has lip and teeth contact." },
+        "short-i": { id: "short-i", title: "Short i as in sit", summary: "Keep it short, light, and slightly central. Do not stretch it into ee.", anchor: "This little bit is still missing.", tips: [{ label: "Tongue", value: "Front of the tongue is high, but not tense." }, { label: "Length", value: "Keep it short. It should not sound like see." }, { label: "Lips", value: "Neutral. No smile needed." }, { label: "Trap", value: "Do not over-smile and turn it into ee." }], drills: ["sit", "live", "pick", "little", "finish"], coach: "If the vowel feels too long and bright, shorten it sharply." },
+        "word-stress": { id: "word-stress", title: "Word stress and shape", summary: "English words have one strong beat. Hit that beat and reduce the rest.", anchor: "The de-CI-sion was ac-TU-al-ly pretty sim-ple.", tips: [{ label: "Beat", value: "One syllable should clearly stand out." }, { label: "Reduction", value: "The weak syllables should become smaller and faster." }, { label: "Rhythm", value: "Do not pronounce every syllable equally." }, { label: "Trap", value: "Flat stress makes speech harder to understand than accent does." }], drills: ["decision", "actually", "important", "comfortable", "develop"], coach: "If the word shape is clear, listeners forgive almost everything else." },
+        "linking": { id: "linking", title: "Linking words together", summary: "Smooth the edges between words so the sentence flows like one unit.", anchor: "I ended up doing it anyway.", tips: [{ label: "Flow", value: "Move from one word to the next without a hard stop." }, { label: "Consonant + Vowel", value: "Carry the final consonant into the next vowel." }, { label: "Weak Words", value: "Reduce words like to, of, and, and a." }, { label: "Trap", value: "Do not isolate every word as if you are reading a list." }], drills: ["pick it up", "kind of", "ended up", "a lot of", "want to"], coach: "Understanding jumps when words stop sounding separated and start sounding connected." },
+        "sentence-stress": { id: "sentence-stress", title: "Sentence stress and emphasis", summary: "Important words get energy. Grammar words shrink.", anchor: "I only did it because they asked me to.", tips: [{ label: "Content Words", value: "Nouns, main verbs, adjectives, and adverbs carry the weight." }, { label: "Function Words", value: "Words like to, a, and, of usually reduce." }, { label: "Meaning", value: "Stress changes what sounds important." }, { label: "Trap", value: "Stressing every word makes you sound robotic." }], drills: ["I did not say he stole the money.", "That was really not what I meant."], coach: "Change stress and the sentence meaning shifts. That is why this drill matters." }
+      },
+      clips: [
+        { id: "clip-001", title: "Coffee Line Recovery", scene: "You are in a coffee line, still waking up, and explaining why your morning went off track.", focusId: "linking", targetLineIndex: 2, note: "Listen for connected speech and soft fillers instead of isolated textbook words.", quote: "Fast speech becomes possible when the gaps between words disappear.", lines: ["I almost missed the train this morning.", "I was about to leave, and then I realized I had left my wallet on the kitchen table.", "So I ended up running back upstairs and grabbing it at the last second.", "By the time I got outside again, the bus was already gone.", "Honestly, after that, the whole day felt rushed."] },
+        { id: "clip-002", title: "Movie Opinion Without Freezing", scene: "You are explaining why a movie worked for you even though it had obvious flaws.", focusId: "sentence-stress", targetLineIndex: 3, note: "Copy the rises and drops in meaning, not just the words.", quote: "Good fluency is often better emphasis, not more vocabulary.", lines: ["I would not say it was a perfect movie.", "The plot was kind of messy in the middle.", "That being said, I still enjoyed it because the acting felt really natural.", "What actually stayed with me was the way the characters spoke to each other.", "It felt more like real conversation than written dialogue."] },
+        { id: "clip-003", title: "Explaining a Work Problem Clearly", scene: "You are describing a small but annoying technical issue to a teammate.", focusId: "word-stress", targetLineIndex: 1, note: "Hit the strong syllables clearly and shrink the rest.", quote: "If the word shape is clear, listeners forgive almost everything else.", lines: ["The main issue is that the upload keeps failing halfway through.", "At first I thought it was a network problem, but it only happens on one specific file.", "I checked the format, the size, and even the file name, but nothing obvious stood out.", "So now I am trying to narrow down whether it is the file itself or the tool we are using.", "If I can reproduce it again, I should have a cleaner report."] },
+        { id: "clip-004", title: "Telling a Slightly Embarrassing Story", scene: "You are telling a short story about a social mistake and trying to make it sound light.", focusId: "r-sound", targetLineIndex: 4, note: "Stay relaxed and keep the r smooth, not rolled.", quote: "Stories get easier when you already know the rhythm of what comes next.", lines: ["The other day I waved at someone across the street because I thought it was my neighbor.", "The person waved back for a second, and then I realized I had the wrong guy.", "We just kept walking like nothing had happened, which somehow made it even worse.", "For some reason, that kind of thing always feels more dramatic in the moment.", "Now it is funny, but at the time I really wanted to disappear."] },
+        { id: "clip-005", title: "Ordering With a Small Change", scene: "You are ordering food and asking for a simple modification without sounding stiff.", focusId: "short-i", targetLineIndex: 2, note: "Keep the short vowels quick and easy instead of stretched.", quote: "Short vowels lose clarity first when speakers rush.", lines: ["Hi, can I get the chicken wrap, please?", "Actually, could you leave out the onions and add a little extra spinach?", "If possible, I would like the sauce on the side.", "I am just trying to keep it a bit lighter today.", "That should be it, thanks."] },
+        { id: "clip-006", title: "Giving a Calm Recommendation", scene: "You are recommending a series to a friend without overselling it.", focusId: "th-voiced", targetLineIndex: 1, note: "Let the voiced th buzz gently instead of hitting it like d.", quote: "Gentle voiced th sounds much clearer than hard substitutions.", lines: ["There is this series I think you would actually like.", "The first episode is a little slow, but after that the whole thing opens up.", "What makes it work is the chemistry between the main characters.", "They feel like people you could know in real life.", "If you give it two episodes, you will know whether it is for you."] },
+        { id: "clip-007", title: "Travel Problem at the Airport", scene: "You are explaining a delayed connection and what happened next.", focusId: "th-clear", targetLineIndex: 3, note: "Make the th airy and visible instead of turning it into s or t.", quote: "Clear th is less about force and more about tongue placement.", lines: ["My first flight landed late, so I barely had time to get across the terminal.", "I thought I could still make the connection if I moved fast enough.", "Then I got to the gate and found out they had already closed the door.", "That was the moment I realized I would be spending the night there.", "In the end, they put me on another flight the next morning."] },
+        { id: "clip-008", title: "Polite Disagreement in Conversation", scene: "You are disagreeing without sounding aggressive or defensive.", focusId: "w-v", targetLineIndex: 2, note: "Feel the difference between rounded w and lip-contact v.", quote: "Fluency is not only speed. It is also control.", lines: ["I can see why you would think that.", "At the same time, I do not think that is the whole picture.", "What worries me is that we may be focusing on the visible part of the problem only.", "There might be something deeper going on in the background.", "So I would probably wait before making a final call."] },
+        { id: "clip-009", title: "Explaining Why You Learn Something", scene: "You are talking about why you keep practicing English even when progress feels uneven.", focusId: "sentence-stress", targetLineIndex: 4, note: "Push the meaning words and reduce the glue words.", quote: "The message becomes clearer when the important words carry more weight.", lines: ["For me, the biggest reason is not grammar or tests.", "It is the fact that I want to think faster when I speak.", "I already understand a lot, so now the hard part is producing the language in real time.", "That is why I care more about rhythm, confidence, and pronunciation right now.", "If the words come out more naturally, everything else gets easier."] },
+        { id: "clip-010", title: "Weekend Recap With Better Flow", scene: "You are giving a casual recap of your weekend without sounding like a list.", focusId: "linking", targetLineIndex: 1, note: "Link the words so the story feels spoken, not read.", quote: "Conversation sounds fluent when the sentence moves in one piece.", lines: ["I did not do anything wild, but it was a pretty good weekend.", "I caught up on sleep, cleaned up a few things at home, and watched a couple of videos I had saved.", "At one point I thought about going out, but I honestly did not feel like it.", "So I stayed in, cooked something simple, and had a much quieter night than usual.", "It was exactly what I needed."] }
+      ],
+      fluency: [
+        { id: "fluency-001", title: "Explain a rushed morning", lead: "Retell a morning that went wrong, but keep the timeline clean and fast.", prompts: ["What went wrong first?", "What did you have to fix in a hurry?", "How did the rest of the morning feel after that?"] },
+        { id: "fluency-002", title: "Give a balanced opinion", lead: "Talk about something you liked, but explain the flaws too.", prompts: ["What worked for you?", "What did not work?", "Why would you still recommend it?"] },
+        { id: "fluency-003", title: "Describe a small technical problem", lead: "Explain an issue clearly enough that another person could help you.", prompts: ["What is happening?", "What have you already tried?", "What do you think the cause might be?"] },
+        { id: "fluency-004", title: "Tell an awkward story", lead: "Tell a short embarrassing story and make it sound light, not heavy.", prompts: ["What happened exactly?", "How did you react in the moment?", "Why is it funny now?"] },
+        { id: "fluency-005", title: "Ask for a change politely", lead: "Explain how you would ask for something in a calm, natural way.", prompts: ["What do you want?", "What exactly should be changed?", "How do you keep the tone polite?"] },
+        { id: "fluency-006", title: "Recommend something honestly", lead: "Recommend a film, game, book, or channel without sounding fake.", prompts: ["Why does it stand out?", "Who would like it?", "What should people know before they start?"] },
+        { id: "fluency-007", title: "Explain a travel problem", lead: "Tell a story about delay, confusion, or a missed connection.", prompts: ["What was supposed to happen?", "Where did the plan break?", "How did it finally get resolved?"] },
+        { id: "fluency-008", title: "Disagree without sounding sharp", lead: "Practice calm disagreement with good control.", prompts: ["What part do you understand?", "What part do you disagree with?", "What would you do differently?"] },
+        { id: "fluency-009", title: "Explain your learning goal", lead: "Talk about why you are working on speaking and what good progress would look like.", prompts: ["What is your current weak point?", "What does good speaking feel like to you?", "What are you doing to improve it?"] },
+        { id: "fluency-010", title: "Weekend summary without a script", lead: "Summarize recent free time in a way that sounds conversational, not report-like.", prompts: ["What did you actually do?", "What did you almost do but skip?", "How did the whole weekend feel?"] }
+      ]
+    };
+
+    const STORAGE_KEY = "speaking-lab-html.v1";
+    const MODULE_META = {
+      warmup: { label: "Warm-Up", xp: 20, hint: "Automate five chunks." },
+      clip: { label: "Shadowing", xp: 30, hint: "Mirror the coach clip." },
+      pronunciation: { label: "Pronunciation", xp: 30, hint: "Run one pronunciation round." },
+      fluency: { label: "Fluency", xp: 40, hint: "Finish the 4-3-2 ladder." }
+    };
+    const DAY_BONUS_XP = 50;
+    const STORAGE_PRUNE_DAYS = 45;
+    const PRONUNCIATION_PASS_SCORE = 60;
+    const CHUNK_PASS_SCORE = 74;
+    const SHADOW_MIN_REPEAT_MS = 2600;
+    const SHADOW_PER_WORD_REPEAT_MS = 430;
+
+    let state = loadState();
+    let currentMission = null;
+    let timerState = { running: false, stageIndex: -1, secondsLeft: 240, totalSeconds: 240, intervalId: null, mode: "mission" };
+    let clipPlaybackToken = 0;
+    let activeAudioUrl = null;
+    let mediaRecorder = null;
+    let mediaStream = null;
+    let recordChunks = [];
+    let availableVoices = [];
+    let activeSpokenLineIndex = -1;
+    let micPermissionState = "unknown";
+    let micPrimePromise = null;
+    let persistentMicStream = null;
+    let sharedRecognition = null;
+    let sharedRecognitionDesired = false;
+    let sharedRecognitionReady = false;
+    let sharedRecognitionStartPromise = null;
+    let pendingRecognitionRequest = null;
+    let sharedRecognitionKeepAliveUntil = 0;
+    const elements = {};
+    const SESSION_FLOW = ["warmup", "clip", "pronunciation", "fluency"];
+    let sessionState = {
+      open: false,
+      stepIndex: 0
+    };
+
+    function createDefaultState() {
+      return {
+        version: 1,
+        totalXP: 0,
+        totalSessions: 0,
+        streak: 0,
+        longestStreak: 0,
+        lastCompletedDate: null,
+        chunkMastery: {},
+        pronunciationStats: {},
+        dailyMissions: {},
+        dailyRerolls: {},
+        shadowHistory: [],
+        warmupHistory: [],
+        freeSpeakingTopicId: "",
+        freeSpeakingHistory: [],
+        history: [],
+        reflections: {}
+      };
+    }
+
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) {
+          return createDefaultState();
+        }
+        const parsed = JSON.parse(raw);
+        return {
+          ...createDefaultState(),
+          ...parsed,
+          chunkMastery: parsed.chunkMastery || {},
+          pronunciationStats: parsed.pronunciationStats || {},
+        dailyMissions: parsed.dailyMissions || {},
+        dailyRerolls: parsed.dailyRerolls || {},
+        shadowHistory: Array.isArray(parsed.shadowHistory) ? parsed.shadowHistory : [],
+        warmupHistory: Array.isArray(parsed.warmupHistory) ? parsed.warmupHistory : [],
+        freeSpeakingTopicId: typeof parsed.freeSpeakingTopicId === "string" ? parsed.freeSpeakingTopicId : "",
+        freeSpeakingHistory: Array.isArray(parsed.freeSpeakingHistory) ? parsed.freeSpeakingHistory : [],
+        history: Array.isArray(parsed.history) ? parsed.history : [],
+        reflections: parsed.reflections || {}
+      };
+      } catch (_error) {
+        return createDefaultState();
+      }
+    }
+
+    function saveState() {
+      pruneOldState();
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }
+
+    function pruneOldState() {
+      const threshold = Date.now() - (STORAGE_PRUNE_DAYS * 24 * 60 * 60 * 1000);
+      const nextDaily = {};
+      Object.entries(state.dailyMissions).forEach(([key, mission]) => {
+        if (Date.parse(key) >= threshold || key === getDateKey()) {
+          nextDaily[key] = mission;
+        }
+      });
+      state.dailyMissions = nextDaily;
+      state.history = state.history.filter((entry) => Date.parse(entry.date) >= threshold).slice(0, 24);
+    }
+
+    function getDateKey(date = new Date()) {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, "0");
+      const day = String(date.getDate()).padStart(2, "0");
+      return `${year}-${month}-${day}`;
+    }
+
+    function hashString(value) {
+      let hash = 1779033703 ^ value.length;
+      for (let index = 0; index < value.length; index += 1) {
+        hash = Math.imul(hash ^ value.charCodeAt(index), 3432918353);
+        hash = (hash << 13) | (hash >>> 19);
+      }
+      return function finalize() {
+        hash = Math.imul(hash ^ (hash >>> 16), 2246822507);
+        hash = Math.imul(hash ^ (hash >>> 13), 3266489909);
+        return (hash ^= hash >>> 16) >>> 0;
+      };
+    }
+
+    function mulberry32(seed) {
+      let value = seed >>> 0;
+      return function random() {
+        value += 0x6D2B79F5;
+        let next = value;
+        next = Math.imul(next ^ (next >>> 15), next | 1);
+        next ^= next + Math.imul(next ^ (next >>> 7), next | 61);
+        return ((next ^ (next >>> 14)) >>> 0) / 4294967296;
+      };
+    }
+
+    function seededRandom(seedText) {
+      return mulberry32(hashString(seedText)());
+    }
+
+    function sampleUnique(items, count, rng) {
+      const pool = items.slice();
+      const picks = [];
+      while (pool.length && picks.length < count) {
+        const index = Math.floor(rng() * pool.length);
+        picks.push(pool.splice(index, 1)[0]);
+      }
+      return picks;
+    }
+
+    function findClip(clipId) {
+      return APP_DATA.clips.find((clip) => clip.id === clipId);
+    }
+
+    function findFluency(fluencyId) {
+      return APP_DATA.fluency.find((item) => item.id === fluencyId);
+    }
+
+    function findChunk(chunkId) {
+      return APP_DATA.chunks.find((chunk) => chunk.id === chunkId);
+    }
+
+    function getFocus(focusId) {
+      return APP_DATA.pronunciation[focusId];
+    }
+
+    function getLevelFromXp(xp) {
+      return 1 + Math.floor(xp / 220);
+    }
+
+    function ensureMission(dateKey = getDateKey()) {
+      if (state.dailyMissions[dateKey]) {
+        currentMission = state.dailyMissions[dateKey];
+        currentMission.chunkChecks = currentMission.chunkChecks || {};
+        currentMission.shadowClipId = currentMission.shadowClipId || currentMission.clipId;
+        return currentMission;
+      }
+
+      const reroll = state.dailyRerolls[dateKey] || 0;
+      const rng = seededRandom(`${dateKey}:${reroll}`);
+      const recentClipIds = new Set(state.history.slice(0, 5).map((entry) => entry.clipId));
+      const recentChunkIds = new Set(
+        state.history.slice(-4).flatMap((entry) => Array.isArray(entry.chunkIds) ? entry.chunkIds : [])
+      );
+
+      const clipPool = APP_DATA.clips.filter((clip) => !recentClipIds.has(clip.id));
+      const clipSource = clipPool.length ? clipPool : APP_DATA.clips;
+      const clip = clipSource[Math.floor(rng() * clipSource.length)];
+
+      const chunkPool = APP_DATA.chunks.filter((chunk) => {
+        const mastery = Number(state.chunkMastery[chunk.id] || 0);
+        return mastery < 3 && !recentChunkIds.has(chunk.id);
+      });
+      const chunks = sampleUnique(chunkPool.length >= 5 ? chunkPool : APP_DATA.chunks, 5, rng);
+
+      const matchingFluency = APP_DATA.fluency.filter((item) => item.id.split("-")[1] === clip.id.split("-")[1]);
+      const fluency = matchingFluency[0] || APP_DATA.fluency[Math.floor(rng() * APP_DATA.fluency.length)];
+      const focus = getFocus(clip.focusId);
+
+      currentMission = {
+        date: dateKey,
+        clipId: clip.id,
+        shadowClipId: clip.id,
+        chunkIds: chunks.map((chunk) => chunk.id),
+        fluencyId: fluency.id,
+        focusId: focus.id,
+        selectedLineIndex: Number.isInteger(clip.targetLineIndex) ? clip.targetLineIndex : 0,
+        completed: { warmup: false, clip: false, pronunciation: false, fluency: false },
+        xpAwarded: { warmup: false, clip: false, pronunciation: false, fluency: false, day: false },
+        lastPronunciation: null,
+        chunkChecks: {}
+      };
+
+      state.dailyMissions[dateKey] = currentMission;
+      saveState();
+      return currentMission;
+    }
+
+    function rerollToday() {
+      const today = getDateKey();
+      state.dailyRerolls[today] = (state.dailyRerolls[today] || 0) + 1;
+      delete state.dailyMissions[today];
+      currentMission = null;
+      saveState();
+      ensureMission(today);
+      renderAll();
+      showReflectionStatus("New daily mission generated.", false);
+    }
+
+    function getClipFluency(clipId, fallbackFluencyId = currentMission?.fluencyId) {
+      const matchingFluency = APP_DATA.fluency.filter((item) => item.id.split("-")[1] === String(clipId).split("-")[1]);
+      return matchingFluency[0] || findFluency(fallbackFluencyId) || APP_DATA.fluency[0];
+    }
+
+    function getMissionClip() {
+      return findClip(currentMission.shadowClipId || currentMission.clipId);
+    }
+
+    function getMissionChunks() {
+      return currentMission.chunkIds.map(findChunk).filter(Boolean);
+    }
+
+    function getMissionFocus() {
+      return getFocus(getMissionClip().focusId);
+    }
+
+    function getMissionFluency() {
+      return getClipFluency(getMissionClip().id, currentMission.fluencyId);
+    }
+
+    function getFreeSpeakingTopic() {
+      const current = findFluency(state.freeSpeakingTopicId);
+      if (current) {
+        return current;
+      }
+      const fallback = APP_DATA.fluency[0];
+      state.freeSpeakingTopicId = fallback?.id || "";
+      return fallback;
+    }
+
+    function selectNextFreeSpeakingTopic() {
+      const recentIds = new Set([
+        state.freeSpeakingTopicId,
+        ...state.freeSpeakingHistory.slice(0, 8)
+      ].filter(Boolean));
+      const pool = APP_DATA.fluency.filter((item) => !recentIds.has(item.id));
+      const source = pool.length ? pool : APP_DATA.fluency;
+      const rng = seededRandom(`${getDateKey()}:free-speaking:${Date.now()}:${state.freeSpeakingHistory.length}`);
+      return source[Math.floor(rng() * source.length)] || APP_DATA.fluency[0];
+    }
+
+    function rerollFreeSpeakingTopic() {
+      const next = selectNextFreeSpeakingTopic();
+      if (!next) {
+        return;
+      }
+      state.freeSpeakingTopicId = next.id;
+      state.freeSpeakingHistory = [next.id, ...state.freeSpeakingHistory.filter((id) => id !== next.id)].slice(0, 20);
+      saveState();
+      renderFreeSpeakingPanel();
+      showReflectionStatus("New free-speaking topic loaded.", false);
+    }
+
+    function getSelectedClipLine() {
+      const clip = getMissionClip();
+      return clip.lines[currentMission.selectedLineIndex] || clip.lines[0] || getMissionFocus().anchor;
+    }
+
+    function daysBetween(dateA, dateB) {
+      const start = Date.parse(dateA);
+      const end = Date.parse(dateB);
+      return Math.round((end - start) / 86400000);
+    }
+
+    function updateHistory() {
+      const clip = getMissionClip();
+      const fluency = getMissionFluency();
+      const existing = state.history.find((entry) => entry.date === currentMission.date);
+      const completedModules = Object.keys(currentMission.completed).filter((key) => currentMission.completed[key]);
+      const entry = {
+        date: currentMission.date,
+        clipId: getMissionClip().id,
+        clipTitle: clip.title,
+        chunkIds: currentMission.chunkIds.slice(),
+        fluencyTitle: fluency.title,
+        completedModules,
+        xp: completedModules.reduce((sum, key) => sum + MODULE_META[key].xp, 0) + (currentMission.xpAwarded.day ? DAY_BONUS_XP : 0)
+      };
+      if (existing) {
+        Object.assign(existing, entry);
+      } else {
+        state.history.push(entry);
+        state.history.sort((left, right) => right.date.localeCompare(left.date));
+        state.history = state.history.slice(0, 24);
+      }
+    }
+
+    function selectNextShadowClipId() {
+      const currentClipId = currentMission.shadowClipId || currentMission.clipId;
+      const recentShadowIds = state.shadowHistory.slice(0, 8);
+      const freshPool = APP_DATA.clips.filter((clip) => clip.id !== currentClipId && !recentShadowIds.includes(clip.id));
+      const fallbackPool = APP_DATA.clips.filter((clip) => clip.id !== currentClipId);
+      const source = freshPool.length ? freshPool : (fallbackPool.length ? fallbackPool : APP_DATA.clips);
+      const rng = seededRandom(`${getDateKey()}:${Date.now()}:${state.shadowHistory.length}`);
+      const nextClip = source[Math.floor(rng() * source.length)] || APP_DATA.clips[0];
+      return nextClip.id;
+    }
+
+    function advanceShadowClip() {
+      const nextClipId = selectNextShadowClipId();
+      const nextClip = findClip(nextClipId);
+      if (!nextClip) {
+        return;
+      }
+      currentMission.shadowClipId = nextClipId;
+      currentMission.focusId = nextClip.focusId;
+      currentMission.fluencyId = getClipFluency(nextClipId, currentMission.fluencyId).id;
+      currentMission.selectedLineIndex = Number.isInteger(nextClip.targetLineIndex) ? nextClip.targetLineIndex : 0;
+      currentMission.lastPronunciation = null;
+      state.shadowHistory = [nextClipId, ...state.shadowHistory.filter((id) => id !== nextClipId)].slice(0, 24);
+      saveState();
+      renderAll();
+    }
+
+    function selectMoreWarmupChunks() {
+      const excluded = new Set([
+        ...currentMission.chunkIds,
+        ...state.warmupHistory.slice(0, 18)
+      ]);
+      const chunkPool = APP_DATA.chunks.filter((chunk) => {
+        const mastery = Number(state.chunkMastery[chunk.id] || 0);
+        return mastery < 3 && !excluded.has(chunk.id);
+      });
+      const fallbackPool = APP_DATA.chunks.filter((chunk) => !currentMission.chunkIds.includes(chunk.id));
+      const source = chunkPool.length >= 5 ? chunkPool : (fallbackPool.length >= 5 ? fallbackPool : APP_DATA.chunks);
+      const rng = seededRandom(`${getDateKey()}:warmup:${Date.now()}:${state.warmupHistory.length}`);
+      return sampleUnique(source, 5, rng).map((chunk) => chunk.id);
+    }
+
+    function loadMoreWarmupChunks() {
+      const nextChunkIds = selectMoreWarmupChunks();
+      if (!nextChunkIds.length) {
+        return;
+      }
+      currentMission.chunkIds = nextChunkIds;
+      state.warmupHistory = [...nextChunkIds, ...state.warmupHistory.filter((id) => !nextChunkIds.includes(id))].slice(0, 36);
+      saveState();
+      renderChunkPanel();
+      renderSessionOverlay();
+      renderHero();
+    }
+
+    function completeModule(moduleKey) {
+      if (!MODULE_META[moduleKey]) {
+        return;
+      }
+      currentMission.completed[moduleKey] = true;
+      if (!currentMission.xpAwarded[moduleKey]) {
+        currentMission.xpAwarded[moduleKey] = true;
+        state.totalXP += MODULE_META[moduleKey].xp;
+      }
+
+      if (Object.values(currentMission.completed).every(Boolean) && !currentMission.xpAwarded.day) {
+        currentMission.xpAwarded.day = true;
+        state.totalXP += DAY_BONUS_XP;
+        const lastDate = state.lastCompletedDate;
+        if (lastDate === currentMission.date) {
+          // keep current streak
+        } else if (lastDate && daysBetween(lastDate, currentMission.date) === 1) {
+          state.streak += 1;
+        } else {
+          state.streak = 1;
+        }
+        state.lastCompletedDate = currentMission.date;
+        state.totalSessions += 1;
+        state.longestStreak = Math.max(state.longestStreak, state.streak);
+      }
+
+      updateHistory();
+      saveState();
+      renderAll();
+    }
+
+    function completeSessionStep(moduleKey) {
+      const shouldAdvance = sessionState.open && SESSION_FLOW[sessionState.stepIndex] === moduleKey && sessionState.stepIndex < SESSION_FLOW.length - 1;
+      completeModule(moduleKey);
+      if (shouldAdvance) {
+        sessionState.stepIndex += 1;
+        renderSessionOverlay();
+      }
+    }
+
+    function setChunkMastery(chunkId, level) {
+      state.chunkMastery[chunkId] = level;
+      saveState();
+      renderChunkPanel();
+      renderSessionOverlay();
+      renderHero();
+    }
+
+    function getChunkCheck(chunkId) {
+      return currentMission.chunkChecks?.[chunkId] || null;
+    }
+
+    function isChunkCheckPass(chunkId) {
+      return Boolean(getChunkCheck(chunkId)?.score >= CHUNK_PASS_SCORE);
+    }
+
+    function getChunkMasteryTone(level) {
+      if (level >= 3) {
+        return "automatic";
+      }
+      if (level === 2) {
+        return "almost";
+      }
+      return "again";
+    }
+
+    function getChunkCardClasses(chunkId, mastery) {
+      const classes = [`is-${getChunkMasteryTone(mastery)}`];
+      const check = getChunkCheck(chunkId);
+      if (check) {
+        classes.push(check.score >= CHUNK_PASS_SCORE ? "is-check-pass" : "is-check-warn");
+      }
+      return classes.join(" ");
+    }
+
+    function getChunkCheckMarkup(chunkId) {
+      const result = getChunkCheck(chunkId);
+      if (!result) {
+        return `<span class="chunk-check-badge">Mic not checked</span>`;
+      }
+      const passed = result.score >= CHUNK_PASS_SCORE;
+      return `
+        <span class="chunk-check-badge ${passed ? "is-pass" : "is-warn"}">
+          ${passed ? "Detected cleanly" : `Score ${Math.round(result.score)}`}
+        </span>
+      `;
+    }
+
+    function renderAll() {
+      renderHero();
+      renderMissionPanel();
+      renderClipPanel();
+      renderChunkPanel();
+      renderPronunciationPanel();
+      renderFreeSpeakingPanel();
+      renderFluencyPanel();
+      renderProgressPanel();
+      renderSessionOverlay();
+    }
+
+    function getSessionStepKey() {
+      return SESSION_FLOW[sessionState.stepIndex] || SESSION_FLOW[0];
+    }
+
+    function getFirstIncompleteStepIndex() {
+      const nextIndex = SESSION_FLOW.findIndex((key) => !currentMission.completed[key]);
+      return nextIndex === -1 ? SESSION_FLOW.length - 1 : nextIndex;
+    }
+
+    function openSession() {
+      sessionState.open = true;
+      sessionState.stepIndex = getFirstIncompleteStepIndex();
+      document.body.classList.add("session-open");
+      renderSessionOverlay();
+    }
+
+    function closeSession() {
+      sessionState.open = false;
+      document.body.classList.remove("session-open");
+      renderSessionOverlay();
+    }
+
+    function stepCanAdvance(stepKey) {
+      return Boolean(currentMission.completed[stepKey]);
+    }
+
+    function isPronunciationPass(result = currentMission.lastPronunciation) {
+      return Boolean(result && result.score >= PRONUNCIATION_PASS_SCORE);
+    }
+
+    function isRecordingSelf() {
+      return Boolean(mediaRecorder && mediaRecorder.state === "recording");
+    }
+
+    function nextSessionStep() {
+      if (sessionState.stepIndex >= SESSION_FLOW.length - 1) {
+        closeSession();
+        return;
+      }
+      if (!stepCanAdvance(getSessionStepKey())) {
+        elements.sessionStatus.textContent = "Finish the current step first, then move on.";
+        return;
+      }
+      sessionState.stepIndex += 1;
+      renderSessionOverlay();
+    }
+
+    function previousSessionStep() {
+      sessionState.stepIndex = Math.max(0, sessionState.stepIndex - 1);
+      renderSessionOverlay();
+    }
+
+    function buildSessionBody(stepKey) {
+      if (stepKey === "warmup") {
+        const chunks = getMissionChunks();
+        return `
+          <div class="session-panel">
+            <div class="session-grid">
+              <div class="session-card">
+                <strong>What To Do</strong>
+                <div class="session-checklist">
+                  <div class="session-check ${currentMission.completed.warmup ? "is-done" : ""}">
+                    <span class="session-check-dot"></span>
+                    <div>Read all five chunks out loud twice.</div>
+                  </div>
+                  <div class="session-check ${getMissionChunks().some((chunk) => Number(state.chunkMastery[chunk.id] || 0) >= 2) ? "is-done" : ""}">
+                    <span class="session-check-dot"></span>
+                    <div>Mark each one as <strong>Again</strong>, <strong>Almost</strong>, or <strong>Automatic</strong>.</div>
+                  </div>
+                  <div class="session-check ${currentMission.completed.warmup ? "is-done" : ""}">
+                    <span class="session-check-dot"></span>
+                    <div>When they feel warmed up, mark the step done.</div>
+                  </div>
+                </div>
+              </div>
+              <div class="session-card">
+                <strong>Fast Rule</strong>
+                <div class="session-lead">Do not translate these one by one. Say them as ready-made pieces.</div>
+              </div>
+            </div>
+            <div class="session-phrase-list">
+              ${chunks.map((chunk) => {
+                const mastery = Number(state.chunkMastery[chunk.id] || 0);
+                return `
+                  <div class="session-phrase-item ${getChunkCardClasses(chunk.id, mastery)}">
+                    <div class="session-phrase-top">
+                      <div>
+                        <div class="chunk-text-row">
+                          <h4>${escapeHtml(chunk.text)}</h4>
+                        </div>
+                        <div class="chunk-note">${escapeHtml(chunk.note)}</div>
+                        <div class="chunk-primary-tools">
+                          <button class="chunk-play-button" data-action="play-chunk" data-id="${chunk.id}">Hear It</button>
+                          <button class="chunk-check-button" data-action="check-chunk" data-id="${chunk.id}">Check Me</button>
+                        </div>
+                      </div>
+                      <div class="session-phrase-tools">
+                        <span class="mini-tag">${escapeHtml(chunk.lane)}</span>
+                        ${getChunkCheckMarkup(chunk.id)}
+                      </div>
+                    </div>
+                    <div class="mastery-row" style="margin-top:10px;">
+                      ${[1, 2, 3].map((level) => {
+                        const label = level === 1 ? "Again" : level === 2 ? "Almost" : "Automatic";
+                        const tone = level === 1 ? "tone-again" : level === 2 ? "tone-almost" : "tone-automatic";
+                        return `<button class="chip-button ${tone} ${mastery === level ? "active" : ""}" data-action="chunk-mastery" data-id="${chunk.id}" data-level="${level}">${label}</button>`;
+                      }).join("")}
+                    </div>
+                    ${getChunkCheck(chunk.id) ? `<div class="chunk-check-note">${escapeHtml(getChunkCheck(chunk.id).feedback)}</div>` : ""}
+                  </div>
+                `;
+              }).join("")}
+            </div>
+            <div class="session-actions-inline">
+              <button class="button-ghost" data-action="more-warmup">More</button>
+              <button class="button-primary" data-action="session-complete" data-step="warmup">Finish Warm-Up</button>
+            </div>
+          </div>
+        `;
+      }
+
+      if (stepKey === "clip") {
+        const clip = getMissionClip();
+        return `
+          <div class="session-panel">
+            <div class="session-card">
+              <strong>How To Run This Round</strong>
+              <div class="session-checklist">
+                <div class="session-check">
+                  <span class="session-check-dot"></span>
+                  <div>Play the coach clip once to hear the rhythm.</div>
+                </div>
+                <div class="session-check">
+                  <span class="session-check-dot"></span>
+                  <div>Play <strong>Shadow Mode</strong> and repeat after each sentence.</div>
+                </div>
+                <div class="session-check ${currentMission.completed.clip ? "is-done" : ""}">
+                  <span class="session-check-dot"></span>
+                  <div>When you are done repeating, mark shadowing complete.</div>
+                </div>
+              </div>
+            </div>
+            <div class="session-target-line">${escapeHtml(clip.lines.map((line, index) => `${index + 1}. ${line}`).join(" "))}</div>
+            <div class="session-actions-inline">
+              <button class="button-secondary" id="sessionPlayCoachBtn">Play Coach Clip</button>
+              <button class="button-primary" id="sessionShadowBtn">Run Shadow Mode</button>
+              <button class="button-ghost" data-action="session-complete" data-step="clip">Mark Shadowing Done</button>
+            </div>
+          </div>
+        `;
+      }
+
+      if (stepKey === "pronunciation") {
+        const focus = getMissionFocus();
+        const result = currentMission.lastPronunciation;
+        const passed = isPronunciationPass(result);
+        return `
+          <div class="session-panel">
+            <div class="session-card">
+              <strong>Your Phrase</strong>
+              <div class="session-target-line" style="margin-top:8px;">${escapeHtml(getSelectedClipLine())}</div>
+            </div>
+            <div class="session-grid">
+              <div class="session-card">
+                <strong>Mouth Cue</strong>
+                <div class="session-lead">${escapeHtml(focus.coach)}</div>
+                <div class="session-checklist" style="margin-top:12px;">
+                  ${focus.tips.slice(0, 3).map((tip) => `
+                    <div class="session-check">
+                      <span class="session-check-dot"></span>
+                      <div><strong>${escapeHtml(tip.label)}:</strong> ${escapeHtml(tip.value)}</div>
+                    </div>
+                  `).join("")}
+                </div>
+              </div>
+              <div class="session-card">
+                <strong>Pass Condition</strong>
+                <div class="session-lead">The browser should hear most of the target phrase clearly enough. If the score is under ${PRONUNCIATION_PASS_SCORE}, repeat more slowly and exaggerate the target sound.</div>
+              </div>
+            </div>
+            <div class="session-actions-inline">
+              <button class="button-secondary" id="sessionPlayTargetBtn">Play Target</button>
+              <button class="button-primary" id="sessionMicCheckBtn">Listen To Me</button>
+              <button class="button-ghost" id="sessionRecordBtn">${isRecordingSelf() ? "Stop Recording" : "Record Myself"}</button>
+            </div>
+            <div class="session-mic-result ${passed ? "is-pass" : result ? "is-warn" : ""}" id="sessionMicResult">
+              ${result ? `
+                <div class="pron-status">${passed ? "Phrase detected clearly enough" : "Phrase was not clear enough yet"}</div>
+                <p class="pron-note"><strong>Heard:</strong> ${escapeHtml(result.heard || "nothing clear")}</p>
+                <p class="pron-note"><strong>Feedback:</strong> ${escapeHtml(result.feedback)}</p>
+              ` : `
+                <div class="pron-status">No mic check yet.</div>
+                <p class="pron-note">Press <strong>Listen To Me</strong>, read the phrase once, and the app will score how close it sounded.</p>
+              `}
+            </div>
+          </div>
+        `;
+      }
+
+      const fluency = getMissionFluency();
+      return `
+        <div class="session-panel">
+          <div class="session-grid">
+            <div class="session-card">
+              <strong>Prompt</strong>
+              <div class="session-lead">${escapeHtml(fluency.lead)}</div>
+              <ul class="prompt-list" style="margin-top:10px;">
+                ${fluency.prompts.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}
+              </ul>
+            </div>
+            <div class="session-card">
+              <strong>Flow Rule</strong>
+              <div class="session-lead">First talk for 4 minutes, then repeat the same topic in 3 minutes, then in 2. Each round should become simpler and smoother.</div>
+            </div>
+          </div>
+          <div class="timer-stage">
+            <div class="timer-label" id="sessionTimerLabelMirror">Fluency Timer</div>
+            <div class="timer-value" id="sessionTimerValueMirror">${escapeHtml(elements.timerValue ? elements.timerValue.textContent : "04:00")}</div>
+            <div class="timer-bar"><div class="timer-fill" id="sessionTimerFillMirror" style="width:${elements.timerFill ? elements.timerFill.style.width || "0%" : "0%"}"></div></div>
+          </div>
+          <div class="session-actions-inline">
+            <button class="button-primary" id="sessionRunFluencyBtn">Run 4-3-2</button>
+            <button class="button-ghost" id="sessionSkipStageBtn">Skip Stage</button>
+            <button class="button-secondary" data-action="session-complete" data-step="fluency">Finish Fluency Step</button>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderSessionOverlay() {
+      if (!elements.sessionOverlay) {
+        return;
+      }
+      if (!sessionState.open) {
+        elements.sessionOverlay.hidden = true;
+        return;
+      }
+
+      elements.sessionOverlay.hidden = false;
+      const stepKey = getSessionStepKey();
+      const currentIndex = sessionState.stepIndex;
+
+      elements.sessionTrack.innerHTML = SESSION_FLOW.map((key, index) => `
+        <div class="session-step-pill ${index === currentIndex ? "active" : ""} ${currentMission.completed[key] ? "done" : ""}">
+          <strong>Step ${index + 1}</strong>
+          <span>${escapeHtml(MODULE_META[key].label)}</span>
+        </div>
+      `).join("");
+
+      const titles = {
+        warmup: "Warm up your speaking chunks",
+        clip: "Copy the coach and shadow the clip",
+        pronunciation: "Say the exact phrase into the mic",
+        fluency: "Retell the topic in the 4-3-2 ladder"
+      };
+
+      const leads = {
+        warmup: "This is the first step. Learn the phrases for today until they feel like ready-made speech blocks.",
+        clip: "Now mirror the coach. First hear the rhythm, then repeat after each line.",
+        pronunciation: "Now the app listens to your microphone and checks whether your target phrase is detected clearly enough.",
+        fluency: "Finish by speaking freely without reading. The timer gets shorter each round so your speech becomes lighter and faster."
+      };
+
+      elements.sessionStepKicker.textContent = `Step ${currentIndex + 1} of ${SESSION_FLOW.length}`;
+      elements.sessionStepTitle.textContent = titles[stepKey];
+      elements.sessionStepLead.textContent = leads[stepKey];
+      elements.sessionStepBody.innerHTML = buildSessionBody(stepKey);
+
+      elements.sessionBackBtn.disabled = currentIndex === 0;
+      const lastStep = currentIndex === SESSION_FLOW.length - 1;
+      elements.sessionNextBtn.textContent = lastStep ? "Finish Session" : "Next";
+      elements.sessionNextBtn.disabled = !stepCanAdvance(stepKey);
+      elements.sessionStatus.textContent = stepCanAdvance(stepKey)
+        ? (lastStep ? "Everything for this mission is ready. Finish the guided session." : "Step complete. Move to the next one.")
+        : "Complete this step to unlock the next one.";
+
+      const sessionTimerLabel = document.getElementById("sessionTimerLabelMirror");
+      const sessionTimerValue = document.getElementById("sessionTimerValueMirror");
+      const sessionTimerFill = document.getElementById("sessionTimerFillMirror");
+      if (sessionTimerLabel && elements.timerLabel) {
+        sessionTimerLabel.textContent = elements.timerLabel.textContent;
+      }
+      if (sessionTimerValue && elements.timerValue) {
+        sessionTimerValue.textContent = elements.timerValue.textContent;
+      }
+      if (sessionTimerFill && elements.timerFill) {
+        sessionTimerFill.style.width = elements.timerFill.style.width;
+      }
+    }
+
+    function renderHero() {
+      const clip = getMissionClip();
+      const focus = getMissionFocus();
+      const meta = [`Clip: ${clip.title}`, `Focus: ${focus.title}`, `${getMissionChunks().length} chunks today`];
+      elements.heroMeta.innerHTML = meta.map((item) => `<span class="meta-chip">${escapeHtml(item)}</span>`).join("");
+      const completedCount = Object.values(currentMission.completed).filter(Boolean).length;
+      elements.daySummary.textContent = `Today: ${completedCount}/4 rounds complete. Day bonus unlocks at full clear.`;
+
+      const masteredCount = Object.values(state.chunkMastery).filter((value) => Number(value) >= 3).length;
+      const level = getLevelFromXp(state.totalXP);
+      const stats = [
+        { label: "Streak", value: `${state.streak}`, note: state.streak ? "Keep the chain alive by clearing the full daily route." : "Finish one full mission to start the chain." },
+        { label: "Level", value: `${level}`, note: `${state.totalXP} XP collected from shadowing, pronunciation, and fluency rounds.` },
+        { label: "Mastered Chunks", value: `${masteredCount}`, note: "Chunks marked automatic come back less often in new missions." },
+        { label: "Sessions", value: `${state.totalSessions}`, note: `Longest streak: ${state.longestStreak}. The app rotates material using your history.` }
+      ];
+      elements.heroStats.innerHTML = stats.map((item) => `
+        <article class="stat-card">
+          <div class="stat-label">${escapeHtml(item.label)}</div>
+          <div class="stat-value">${escapeHtml(item.value)}</div>
+          <div class="stat-note">${escapeHtml(item.note)}</div>
+        </article>
+      `).join("");
+    }
+
+    function renderMissionPanel() {
+      const clip = getMissionClip();
+      const focus = getMissionFocus();
+      const fluency = getMissionFluency();
+      const dateText = new Intl.DateTimeFormat(undefined, { weekday: "long", day: "numeric", month: "long" }).format(new Date(`${currentMission.date}T12:00:00`));
+      elements.missionDateTag.textContent = dateText;
+      elements.missionIntro.textContent = `Coach clip: ${clip.title}. Sound focus: ${focus.title}. Fluency topic: ${fluency.title}.`;
+      elements.missionQuote.textContent = clip.quote;
+
+      const steps = [
+        { key: "warmup", copy: "Drill today’s phrase bank until the chunks feel ready to steal in real speech." },
+        { key: "clip", copy: "Run the internal coach reel and mirror the transcript out loud." },
+        { key: "pronunciation", copy: "Use the pronunciation lab, get browser feedback, and compare yourself." },
+        { key: "fluency", copy: "Finish the 4-3-2 ladder without stopping to translate." }
+      ];
+
+      elements.missionSteps.innerHTML = steps.map((step) => {
+        const done = currentMission.completed[step.key];
+        return `
+          <article class="mission-step ${done ? "is-done" : ""}">
+            <div class="mission-step-title">
+              <span>${escapeHtml(MODULE_META[step.key].label)}</span>
+              <span class="step-status ${done ? "done" : "live"}">${done ? "Done" : `${MODULE_META[step.key].xp} XP`}</span>
+            </div>
+            <p class="mission-step-copy">${escapeHtml(step.copy)}</p>
+          </article>
+        `;
+      }).join("");
+    }
+
+    function renderClipPanel() {
+      const clip = getMissionClip();
+      const focus = getMissionFocus();
+      elements.clipTitle.textContent = clip.title;
+      elements.clipScene.textContent = clip.scene;
+      elements.clipFocusTag.textContent = `Shadow Goal: ${focus.title}`;
+      elements.clipNote.textContent = clip.note;
+      elements.clipPlaybackStatus.textContent = "Ready";
+      elements.clipSubtitle.textContent = getSelectedClipLine();
+      elements.clipSubtitle.classList.toggle("is-speaking-line", activeSpokenLineIndex >= 0);
+      elements.waveGrid.innerHTML = Array.from({ length: 18 }, (_, index) => {
+        const bar = 5 + ((index * 7) % 13);
+        return `<span class="wave-bar" style="--bar:${bar}; --delay:${index};"></span>`;
+      }).join("");
+      elements.transcriptList.innerHTML = clip.lines.map((line, index) => `
+        <button class="transcript-line ${currentMission.selectedLineIndex === index ? "is-active" : ""} ${activeSpokenLineIndex === index ? "is-speaking-line" : ""}" style="${activeSpokenLineIndex === index ? `--speak-duration:${estimateSpeechDurationMs(line, 0.84)}ms;` : ""}" data-action="select-line" data-index="${index}">
+          ${escapeHtml(line)}
+          <small>${index === currentMission.selectedLineIndex ? "Target phrase in pronunciation lab" : "Click to send this line into the pronunciation lab"}</small>
+        </button>
+      `).join("");
+    }
+
+    function renderChunkPanel() {
+      const chunks = getMissionChunks();
+      const warmed = chunks.filter((chunk) => Number(state.chunkMastery[chunk.id] || 0) >= 2).length;
+      elements.chunkTag.textContent = `${warmed}/${chunks.length} warmed`;
+      elements.chunkList.innerHTML = chunks.map((chunk) => {
+        const mastery = Number(state.chunkMastery[chunk.id] || 0);
+        const labels = [{ level: 1, label: "Again" }, { level: 2, label: "Almost" }, { level: 3, label: "Automatic" }];
+        return `
+          <article class="chunk-card ${getChunkCardClasses(chunk.id, mastery)}">
+            <div class="chunk-head">
+              <div>
+                <div class="chunk-text-row">
+                  <div class="chunk-text">${escapeHtml(chunk.text)}</div>
+                </div>
+                <p class="chunk-note">${escapeHtml(chunk.note)}</p>
+                <div class="chunk-primary-tools">
+                  <button class="chunk-play-button" data-action="play-chunk" data-id="${chunk.id}">Hear It</button>
+                  <button class="chunk-check-button" data-action="check-chunk" data-id="${chunk.id}">Check Me</button>
+                </div>
+                ${getChunkCheck(chunk.id) ? `<div class="chunk-check-note">${escapeHtml(getChunkCheck(chunk.id).feedback)}</div>` : ""}
+              </div>
+              <div class="chunk-side-status">
+                <span class="mini-tag">${escapeHtml(chunk.lane)}</span>
+                ${getChunkCheckMarkup(chunk.id)}
+              </div>
+            </div>
+            <div class="mastery-row">
+              ${labels.map((item) => `
+                <button class="chip-button ${item.level === 1 ? "tone-again" : item.level === 2 ? "tone-almost" : "tone-automatic"} ${mastery === item.level ? "active" : ""}" data-action="chunk-mastery" data-id="${chunk.id}" data-level="${item.level}">${item.label}</button>
+              `).join("")}
+            </div>
+          </article>
+        `;
+      }).join("");
+    }
+
+    function renderPronunciationPanel() {
+      const focus = getMissionFocus();
+      const result = currentMission.lastPronunciation;
+      elements.pronFocusTitle.textContent = focus.title;
+      elements.pronFocusCopy.textContent = `${focus.summary} ${focus.coach}`;
+      elements.pronSupportTag.textContent = getSpeechSupportLabel();
+      elements.pronTargetPhrase.textContent = getSelectedClipLine();
+      elements.pronAnchorPhrase.textContent = focus.anchor;
+      elements.pronTips.innerHTML = focus.tips.map((tip) => `
+        <article class="focus-tip">
+          <strong>${escapeHtml(tip.label)}</strong>
+          <div>${escapeHtml(tip.value)}</div>
+        </article>
+      `).join("");
+      elements.pronDrills.innerHTML = focus.drills.map((drill) => `<span class="drill-chip">${escapeHtml(drill)}</span>`).join("");
+      elements.recordSelfBtn.textContent = isRecordingSelf() ? "Stop Recording" : "Record Myself";
+
+      const playback = elements.selfPlayback;
+      if (activeAudioUrl) {
+        playback.style.display = "block";
+        playback.src = activeAudioUrl;
+      } else {
+        playback.style.display = "none";
+        playback.removeAttribute("src");
+      }
+
+      if (!result) {
+        elements.pronResult.innerHTML = `
+          <div class="pron-status">No pronunciation attempt yet.</div>
+          <p class="pron-note">Use browser speech check for an instant approximation, or record yourself and compare with the coach.</p>
+        `;
+        if (activeAudioUrl) {
+          elements.pronResult.appendChild(playback);
+        }
+        return;
+      }
+
+      const verdict = result.score >= 88 ? "Very clear" : result.score >= 72 ? "Mostly clear" : result.score >= PRONUNCIATION_PASS_SCORE ? "Clear enough to move on" : "Slow down and exaggerate the target sound";
+      elements.pronResult.innerHTML = `
+        <div class="pron-score">
+          <div>
+            <div class="pron-status">${escapeHtml(verdict)}</div>
+            <p class="pron-note">${escapeHtml(result.feedback)}</p>
+          </div>
+          <div class="score-badge">${Math.round(result.score)}</div>
+        </div>
+        <p class="pron-note"><strong>Browser heard:</strong> ${escapeHtml(result.heard || "nothing clear")}</p>
+      `;
+      if (activeAudioUrl) {
+        elements.pronResult.appendChild(playback);
+      }
+    }
+
+    function renderFluencyPanel() {
+      const fluency = getMissionFluency();
+      elements.fluencyTitle.textContent = fluency.title;
+      elements.fluencyCopy.textContent = "One topic, three shorter retells. The idea is not perfect grammar. The idea is speed, structure, and flow.";
+      elements.fluencyPromptTitle.textContent = fluency.title;
+      elements.fluencyPromptLead.textContent = fluency.lead;
+      elements.fluencyPromptList.innerHTML = fluency.prompts.map((item) => `<li>${escapeHtml(item)}</li>`).join("");
+      updateTimerUI();
+    }
+
+    function renderFreeSpeakingPanel() {
+      const topic = getFreeSpeakingTopic();
+      if (!topic) {
+        return;
+      }
+      elements.freeSpeakingTitle.textContent = "Open-topic speaking block";
+      elements.freeSpeakingCopy.textContent = "Use this standalone block whenever you want to speak for a few minutes without opening the full mission. Rotate the topic and run the same 4-3-2 ladder on demand.";
+      elements.freeSpeakingPromptTitle.textContent = topic.title;
+      elements.freeSpeakingPromptLead.textContent = topic.lead;
+      elements.freeSpeakingPromptList.innerHTML = topic.prompts.map((item) => `<li>${escapeHtml(item)}</li>`).join("");
+      elements.freeSpeakingTag.textContent = "Instant use";
+      const status = timerState.mode === "free"
+        ? "Standalone timer is running."
+        : "Ready for a standalone fluency round.";
+      elements.freeSpeakingStatus.textContent = status;
+      updateTimerUI();
+    }
+
+    function buildWeakAreas() {
+      const entries = Object.entries(state.pronunciationStats).map(([focusId, value]) => {
+        const focus = getFocus(focusId);
+        const average = value.attempts ? value.totalScore / value.attempts : 0;
+        return {
+          title: focus.title,
+          average,
+          note: value.attempts ? `Average check score ${Math.round(average)} across ${value.attempts} attempts.` : "No attempts yet."
+        };
+      });
+      return entries.sort((left, right) => left.average - right.average).slice(0, 3);
+    }
+
+    function renderProgressPanel() {
+      elements.levelTag.textContent = `Level ${getLevelFromXp(state.totalXP)}`;
+      const historyItems = state.history.slice(0, 6);
+      elements.historyList.innerHTML = historyItems.length
+        ? historyItems.map((entry) => `
+          <article class="history-card">
+            <div class="history-head">
+              <div>
+                <div class="history-title">${escapeHtml(entry.clipTitle)}</div>
+                <div class="history-meta">${escapeHtml(entry.date)}</div>
+              </div>
+              <span class="mini-tag">${entry.completedModules.length}/4</span>
+            </div>
+            <p class="history-note">${escapeHtml(entry.fluencyTitle)}</p>
+          </article>
+        `).join("")
+        : `<article class="history-card"><p class="history-note">No completed days yet. Clear one full mission and your memory trail will start here.</p></article>`;
+
+      const weakAreas = buildWeakAreas();
+      elements.weakList.innerHTML = weakAreas.length
+        ? weakAreas.map((item) => `
+          <article class="weak-card">
+            <strong>${escapeHtml(item.title)}</strong>
+            <p>${escapeHtml(item.note)}</p>
+          </article>
+        `).join("")
+        : `<article class="weak-card"><strong>Fresh start</strong><p>No weak areas tracked yet. Once you run pronunciation checks, this panel will adapt.</p></article>`;
+
+      elements.reflectionInput.value = state.reflections[currentMission.date] || "";
+    }
+
+    function updateTimerUI() {
+      const sequence = [
+        { label: "Stage 1 | 4 minutes", seconds: 240 },
+        { label: "Stage 2 | 3 minutes", seconds: 180 },
+        { label: "Stage 3 | 2 minutes", seconds: 120 }
+      ];
+      const stage = sequence[timerState.stageIndex] || sequence[0];
+      const secondsLeft = timerState.running ? timerState.secondsLeft : stage.seconds;
+      const minutes = String(Math.floor(secondsLeft / 60)).padStart(2, "0");
+      const seconds = String(secondsLeft % 60).padStart(2, "0");
+      elements.timerLabel.textContent = timerState.running ? stage.label : "Ready";
+      elements.timerValue.textContent = `${minutes}:${seconds}`;
+      const percent = timerState.running ? ((timerState.totalSeconds - timerState.secondsLeft) / timerState.totalSeconds) * 100 : 0;
+      elements.timerFill.style.width = `${Math.max(0, Math.min(100, percent))}%`;
+      const sessionTimerLabel = document.getElementById("sessionTimerLabelMirror");
+      const sessionTimerValue = document.getElementById("sessionTimerValueMirror");
+      const sessionTimerFill = document.getElementById("sessionTimerFillMirror");
+      if (sessionTimerLabel) {
+        sessionTimerLabel.textContent = elements.timerLabel.textContent;
+      }
+      if (sessionTimerValue) {
+        sessionTimerValue.textContent = elements.timerValue.textContent;
+      }
+      if (sessionTimerFill) {
+        sessionTimerFill.style.width = elements.timerFill.style.width;
+      }
+      if (elements.freeTimerLabel) {
+        elements.freeTimerLabel.textContent = elements.timerLabel.textContent;
+      }
+      if (elements.freeTimerValue) {
+        elements.freeTimerValue.textContent = elements.timerValue.textContent;
+      }
+      if (elements.freeTimerFill) {
+        elements.freeTimerFill.style.width = elements.timerFill.style.width;
+      }
+    }
+
+    function estimateSpeechDurationMs(text, rate = 0.9) {
+      const words = String(text).trim().split(/\s+/).filter(Boolean).length;
+      const chars = String(text).trim().length;
+      const base = (words * 360) + (chars * 18);
+      return Math.max(1100, Math.round(base / Math.max(rate, 0.65)));
+    }
+
+    function normalizeText(value) {
+      return String(value).toLowerCase().replace(/[^a-z0-9'\s]/g, " ").replace(/\s+/g, " ").trim();
+    }
+
+    function levenshtein(a, b) {
+      const rows = a.length + 1;
+      const cols = b.length + 1;
+      const matrix = Array.from({ length: rows }, () => Array(cols).fill(0));
+      for (let row = 0; row < rows; row += 1) {
+        matrix[row][0] = row;
+      }
+      for (let col = 0; col < cols; col += 1) {
+        matrix[0][col] = col;
+      }
+      for (let row = 1; row < rows; row += 1) {
+        for (let col = 1; col < cols; col += 1) {
+          const cost = a[row - 1] === b[col - 1] ? 0 : 1;
+          matrix[row][col] = Math.min(matrix[row - 1][col] + 1, matrix[row][col - 1] + 1, matrix[row - 1][col - 1] + cost);
+        }
+      }
+      return matrix[a.length][b.length];
+    }
+
+    function buildPronunciationFeedback(target, heard, focusId) {
+      const focus = getFocus(focusId);
+      const targetNorm = normalizeText(target);
+      const heardNorm = normalizeText(heard);
+      const charDistance = levenshtein(targetNorm, heardNorm);
+      const charSimilarity = targetNorm.length ? Math.max(0, 1 - (charDistance / Math.max(targetNorm.length, heardNorm.length, 1))) : 0;
+      const targetTokens = targetNorm.split(" ").filter(Boolean);
+      const heardTokens = heardNorm.split(" ").filter(Boolean);
+      const missing = targetTokens.filter((token) => !heardTokens.includes(token));
+      const shared = targetTokens.filter((token) => heardTokens.includes(token));
+      const wordCoverage = targetTokens.length ? shared.length / targetTokens.length : 0;
+      const score = Math.round((charSimilarity * 0.58 + wordCoverage * 0.42) * 100);
+      let feedback = focus.coach;
+      if (missing.length > 0) {
+        feedback = `Missing or unclear words: ${missing.slice(0, 4).join(", ")}. ${focus.coach}`;
+      } else if (score < 62) {
+        feedback = `Slow down, exaggerate the target sound, and hit the stress more clearly. ${focus.coach}`;
+      } else if (score < 80) {
+        feedback = `Good shape, but make the rhythm cleaner and keep the target sound more visible. ${focus.coach}`;
+      } else {
+        feedback = "This is close. Keep the same rhythm and repeat it three more times to lock it in.";
+      }
+      return { score, feedback };
+    }
+
+    function buildChunkCheckFeedback(target, heard) {
+      const targetNorm = normalizeText(target);
+      const heardNorm = normalizeText(heard);
+      const charDistance = levenshtein(targetNorm, heardNorm);
+      const charSimilarity = targetNorm.length ? Math.max(0, 1 - (charDistance / Math.max(targetNorm.length, heardNorm.length, 1))) : 0;
+      const targetTokens = targetNorm.split(" ").filter(Boolean);
+      const heardTokens = heardNorm.split(" ").filter(Boolean);
+      const shared = targetTokens.filter((token) => heardTokens.includes(token));
+      const missing = targetTokens.filter((token) => !heardTokens.includes(token));
+      const score = Math.round(((charSimilarity * 0.55) + ((shared.length / Math.max(targetTokens.length, 1)) * 0.45)) * 100);
+      if (score >= CHUNK_PASS_SCORE) {
+        return { score, feedback: "Detected clearly. This chunk is coming through cleanly." };
+      }
+      if (missing.length) {
+        return { score, feedback: `Missing or unclear words: ${missing.slice(0, 3).join(", ")}. Slow down and keep every word audible.` };
+      }
+      return { score, feedback: "Close, but not clear enough yet. Say it again more slowly with firmer word boundaries." };
+    }
+
+    function getSpeechSupportLabel() {
+      const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!Recognition) {
+        return micPermissionState === "ready" ? "Mic ready • speech check limited" : "Speech check limited";
+      }
+      if (sharedRecognitionReady) {
+        return "Browser speech check ready • live speech session armed";
+      }
+      if (micPermissionState === "ready") {
+        return "Browser speech check ready • mic granted";
+      }
+      if (micPermissionState === "idle") {
+        return "Browser speech check ready • click Check Me once to enable mic";
+      }
+      if (micPermissionState === "denied") {
+        return "Browser speech check ready • mic blocked";
+      }
+      return "Browser speech check ready • mic pending";
+    }
+
+    function prepareSpeech() {
+      availableVoices = window.speechSynthesis ? window.speechSynthesis.getVoices() : [];
+      if (window.speechSynthesis) {
+        window.speechSynthesis.onvoiceschanged = () => {
+          availableVoices = window.speechSynthesis.getVoices();
+        };
+      }
+    }
+
+    function scoreEnglishVoice(voice, targetLang = "en-US") {
+      const lang = String(voice.lang || "").toLowerCase();
+      const identity = `${voice.name || ""} ${voice.voiceURI || ""}`.toLowerCase();
+      let score = 0;
+      if (lang.startsWith(targetLang.toLowerCase())) {
+        score += 80;
+      } else if (lang.startsWith("en")) {
+        score += 45;
+      }
+      if (/natural|neural|enhanced|premium|wavenet/.test(identity)) {
+        score += 140;
+      }
+      if (/microsoft|google/.test(identity)) {
+        score += 45;
+      }
+      if (/aria|jenny|guy|libby|roger|ava|samantha|daniel|alex|serena|moira|karen/.test(identity)) {
+        score += 24;
+      }
+      if (targetLang.toLowerCase() === "en-gb" && /(uk|british|en-gb)/.test(`${identity} ${lang}`)) {
+        score += 22;
+      }
+      if (targetLang.toLowerCase() === "en-us" && /(us|american|en-us)/.test(`${identity} ${lang}`)) {
+        score += 22;
+      }
+      if (voice.default) {
+        score += 6;
+      }
+      return score;
+    }
+
+    function getEnglishVoice(targetLang = "en-US") {
+      if (!availableVoices.length && window.speechSynthesis) {
+        availableVoices = window.speechSynthesis.getVoices();
+      }
+      return availableVoices
+        .filter((voice) => voice.lang && voice.lang.toLowerCase().startsWith("en"))
+        .sort((left, right) => scoreEnglishVoice(right, targetLang) - scoreEnglishVoice(left, targetLang))[0]
+        || availableVoices[0]
+        || null;
+    }
+
+    function speakText(text, options = {}) {
+      if (!window.speechSynthesis) {
+        return Promise.resolve();
+      }
+      window.speechSynthesis.cancel();
+      return new Promise((resolve) => {
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = options.lang || "en-US";
+        utterance.rate = options.rate || 0.9;
+        utterance.pitch = options.pitch || 0.98;
+        utterance.volume = options.volume || 1;
+        utterance.voice = getEnglishVoice(utterance.lang);
+        utterance.onend = () => resolve();
+        utterance.onerror = () => resolve();
+        window.speechSynthesis.speak(utterance);
+      });
+    }
+
+    function playChunkAudio(chunkId) {
+      const chunk = findChunk(chunkId);
+      if (!chunk) {
+        return Promise.resolve();
+      }
+      return speakText(chunk.text, { rate: 0.8, pitch: 0.96, lang: "en-US" });
+    }
+
+    function setActiveSpokenLine(index, text, durationMs) {
+      activeSpokenLineIndex = index;
+      if (elements.clipSubtitle) {
+        elements.clipSubtitle.textContent = text;
+        elements.clipSubtitle.style.setProperty("--speak-duration", `${durationMs}ms`);
+        elements.clipSubtitle.classList.remove("is-speaking-line");
+        void elements.clipSubtitle.offsetWidth;
+        elements.clipSubtitle.classList.add("is-speaking-line");
+      }
+      renderClipPanel();
+    }
+
+    function clearActiveSpokenLine() {
+      activeSpokenLineIndex = -1;
+      if (elements.clipSubtitle) {
+        elements.clipSubtitle.classList.remove("is-speaking-line");
+        elements.clipSubtitle.style.removeProperty("--speak-duration");
+      }
+      renderClipPanel();
+    }
+
+    function wait(ms) {
+      return new Promise((resolve) => window.setTimeout(resolve, ms));
+    }
+
+    function releasePersistentMicStream() {
+      if (!persistentMicStream) {
+        return;
+      }
+      persistentMicStream.getTracks().forEach((track) => track.stop());
+      persistentMicStream = null;
+      if (micPermissionState === "ready") {
+        micPermissionState = "idle";
+      }
+    }
+
+    async function primeMicrophonePermission({ userInitiated = false, keepAlive = true } = {}) {
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        micPermissionState = "unavailable";
+        return false;
+      }
+      if (persistentMicStream && persistentMicStream.active) {
+        micPermissionState = "ready";
+        return true;
+      }
+      if (micPermissionState === "ready" && !keepAlive) {
+        return true;
+      }
+      if (micPermissionState === "denied" && !userInitiated) {
+        return false;
+      }
+      if (micPrimePromise) {
+        return micPrimePromise;
+      }
+
+      micPrimePromise = (async () => {
+        let stream = null;
+        try {
+          stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+          micPermissionState = "ready";
+          if (keepAlive) {
+            releasePersistentMicStream();
+            persistentMicStream = stream;
+            stream = null;
+          }
+          return true;
+        } catch (_error) {
+          micPermissionState = "denied";
+          return false;
+        } finally {
+          if (stream) {
+            stream.getTracks().forEach((track) => track.stop());
+          }
+          micPrimePromise = null;
+          if (currentMission) {
+            renderPronunciationPanel();
+            renderSessionOverlay();
+          }
+        }
+      })();
+
+      return micPrimePromise;
+    }
+
+    async function getRecordingStream() {
+      const hasPermission = await primeMicrophonePermission({ userInitiated: true, keepAlive: true });
+      if (!hasPermission) {
+        throw new Error("mic-not-ready");
+      }
+      if (persistentMicStream?.active) {
+        if (typeof persistentMicStream.clone === "function") {
+          return persistentMicStream.clone();
+        }
+        return persistentMicStream;
+      }
+      return navigator.mediaDevices.getUserMedia({ audio: true });
+    }
+
+    function getRecognitionConstructor() {
+      return window.SpeechRecognition || window.webkitSpeechRecognition || null;
+    }
+
+    function settlePendingRecognitionWithError(message) {
+      if (!pendingRecognitionRequest) {
+        return;
+      }
+      const request = pendingRecognitionRequest;
+      pendingRecognitionRequest = null;
+      if (request.timeoutId) {
+        window.clearTimeout(request.timeoutId);
+      }
+      request.reject(new Error(message));
+    }
+
+    function setupSharedRecognition() {
+      const Recognition = getRecognitionConstructor();
+      if (!Recognition || sharedRecognition) {
+        return;
+      }
+      sharedRecognition = new Recognition();
+      sharedRecognition.lang = "en-US";
+      sharedRecognition.interimResults = false;
+      sharedRecognition.continuous = true;
+      sharedRecognition.maxAlternatives = 1;
+
+      sharedRecognition.onstart = () => {
+        sharedRecognitionReady = true;
+        if (sharedRecognitionStartPromise) {
+          sharedRecognitionStartPromise.resolve(true);
+          sharedRecognitionStartPromise = null;
+        }
+        if (currentMission) {
+          renderPronunciationPanel();
+          renderSessionOverlay();
+        }
+      };
+
+      sharedRecognition.onresult = (event) => {
+        const heard = Array.from(event.results || [])
+          .slice(typeof event.resultIndex === "number" ? event.resultIndex : 0)
+          .filter((result) => result.isFinal)
+          .map((result) => result[0]?.transcript || "")
+          .filter(Boolean)
+          .join(" ")
+          .trim();
+        if (!heard || !pendingRecognitionRequest) {
+          return;
+        }
+        const request = pendingRecognitionRequest;
+        pendingRecognitionRequest = null;
+        if (request.timeoutId) {
+          window.clearTimeout(request.timeoutId);
+        }
+        request.resolve(heard);
+        window.setTimeout(() => {
+          if (!pendingRecognitionRequest) {
+            sharedRecognitionDesired = false;
+            sharedRecognitionKeepAliveUntil = 0;
+            try {
+              sharedRecognition.stop();
+            } catch (_error) {
+              // Ignore stop race if the recognizer is already shutting down.
+            }
+          }
+        }, 120);
+      };
+
+      sharedRecognition.onerror = (event) => {
+        if (event.error === "not-allowed" || event.error === "service-not-allowed") {
+          micPermissionState = "denied";
+          sharedRecognitionDesired = false;
+          sharedRecognitionReady = false;
+        }
+        if (sharedRecognitionStartPromise) {
+          sharedRecognitionStartPromise.resolve(false);
+          sharedRecognitionStartPromise = null;
+        }
+        settlePendingRecognitionWithError(event.error || "speech-error");
+        if (currentMission) {
+          renderPronunciationPanel();
+          renderSessionOverlay();
+        }
+      };
+
+      sharedRecognition.onend = () => {
+        sharedRecognitionReady = false;
+        const shouldRestart = sharedRecognitionDesired
+          && (Boolean(pendingRecognitionRequest) || Date.now() < sharedRecognitionKeepAliveUntil);
+        if (shouldRestart) {
+          window.setTimeout(() => {
+            const stillWanted = sharedRecognitionDesired
+              && (Boolean(pendingRecognitionRequest) || Date.now() < sharedRecognitionKeepAliveUntil);
+            if (!stillWanted) {
+              return;
+            }
+            try {
+              sharedRecognition.start();
+            } catch (_error) {
+              // Keep the recognizer in a recoverable state and wait for next explicit check.
+            }
+          }, 120);
+          return;
+        }
+        sharedRecognitionDesired = false;
+      };
+    }
+
+    async function ensureSharedRecognitionSession({ userInitiated = false } = {}) {
+      const Recognition = getRecognitionConstructor();
+      if (!Recognition) {
+        return false;
+      }
+      setupSharedRecognition();
+      if (sharedRecognitionReady) {
+        return true;
+      }
+      if (sharedRecognitionStartPromise) {
+        return sharedRecognitionStartPromise.promise;
+      }
+
+      sharedRecognitionDesired = true;
+      sharedRecognitionKeepAliveUntil = Date.now() + 15000;
+      sharedRecognitionStartPromise = {};
+      sharedRecognitionStartPromise.promise = new Promise((resolve) => {
+        sharedRecognitionStartPromise.resolve = resolve;
+      });
+
+      try {
+        sharedRecognition.start();
+      } catch (_error) {
+        if (!userInitiated) {
+          sharedRecognitionDesired = false;
+        }
+        if (sharedRecognitionStartPromise) {
+          sharedRecognitionStartPromise.resolve(false);
+          sharedRecognitionStartPromise = null;
+        }
+        return false;
+      }
+
+      return sharedRecognitionStartPromise.promise;
+    }
+
+    async function captureSpeechOnce({ timeoutMs = 6500 } = {}) {
+      const hasPermission = await primeMicrophonePermission({ userInitiated: true, keepAlive: true });
+      if (!hasPermission) {
+        throw new Error("mic-not-ready");
+      }
+      const ready = await ensureSharedRecognitionSession({ userInitiated: true });
+      if (!ready) {
+        throw new Error("speech-session-not-ready");
+      }
+      if (pendingRecognitionRequest) {
+        settlePendingRecognitionWithError("superseded");
+      }
+      return new Promise((resolve, reject) => {
+        const timeoutId = window.setTimeout(() => {
+          if (pendingRecognitionRequest?.timeoutId === timeoutId) {
+            pendingRecognitionRequest = null;
+          }
+          sharedRecognitionDesired = false;
+          sharedRecognitionKeepAliveUntil = 0;
+          try {
+            sharedRecognition?.stop();
+          } catch (_error) {
+            // Ignore stop race when timing out.
+          }
+          reject(new Error("speech-timeout"));
+        }, timeoutMs);
+        pendingRecognitionRequest = { resolve, reject, timeoutId };
+      });
+    }
+
+    async function playClip(mode = "coach") {
+      if (mode === "shadow") {
+        advanceShadowClip();
+      }
+      const clip = getMissionClip();
+      const token = Date.now();
+      clipPlaybackToken = token;
+      elements.videoStage.classList.add("is-speaking");
+      elements.clipPlaybackStatus.textContent = mode === "shadow" ? "Shadow mode" : "Playing";
+
+      for (let index = 0; index < clip.lines.length; index += 1) {
+        if (clipPlaybackToken !== token) {
+          break;
+        }
+        currentMission.selectedLineIndex = index;
+        renderClipPanel();
+        renderPronunciationPanel();
+        elements.videoStage.classList.add("is-speaking");
+        elements.clipPlaybackStatus.textContent = mode === "shadow" ? `Shadow ${index + 1}/${clip.lines.length}` : `Coach ${index + 1}/${clip.lines.length}`;
+        const line = clip.lines[index];
+        const lineRate = mode === "shadow" ? 0.82 : 0.94;
+        const speakDuration = estimateSpeechDurationMs(line, lineRate);
+        setActiveSpokenLine(index, line, speakDuration);
+        await speakText(line, { rate: lineRate });
+        if (mode === "shadow") {
+          clearActiveSpokenLine();
+          elements.clipPlaybackStatus.textContent = "Your turn. Repeat the full sentence now.";
+          elements.videoStage.classList.remove("is-speaking");
+          await wait(Math.max(SHADOW_MIN_REPEAT_MS, line.trim().split(/\s+/).filter(Boolean).length * SHADOW_PER_WORD_REPEAT_MS));
+        } else {
+          clearActiveSpokenLine();
+          await wait(260);
+        }
+      }
+
+      if (clipPlaybackToken === token) {
+        clearActiveSpokenLine();
+        elements.videoStage.classList.remove("is-speaking");
+        elements.clipPlaybackStatus.textContent = "Ready";
+      }
+    }
+
+    function stopClipPlayback() {
+      clipPlaybackToken = -1;
+      if (window.speechSynthesis) {
+        window.speechSynthesis.cancel();
+      }
+      clearActiveSpokenLine();
+      elements.videoStage.classList.remove("is-speaking");
+      elements.clipPlaybackStatus.textContent = "Stopped";
+    }
+
+    async function runChunkCheck(chunkId) {
+      const chunk = findChunk(chunkId);
+      if (!chunk) {
+        return;
+      }
+      if (!getRecognitionConstructor()) {
+        currentMission.chunkChecks[chunkId] = {
+          score: 0,
+          heard: "",
+          feedback: "Browser speech check is not available here. Open the page in Chrome or Edge to use mic checking."
+        };
+        saveState();
+        renderChunkPanel();
+        renderSessionOverlay();
+        return;
+      }
+
+      currentMission.chunkChecks[chunkId] = {
+        score: 0,
+        heard: "",
+        feedback: `Listening for: ${chunk.text}`
+      };
+      renderChunkPanel();
+      renderSessionOverlay();
+
+      try {
+        const heard = await captureSpeechOnce();
+        const { score, feedback } = buildChunkCheckFeedback(chunk.text, heard);
+        currentMission.chunkChecks[chunkId] = { score, heard, feedback };
+      } catch (_error) {
+        currentMission.chunkChecks[chunkId] = {
+          score: 0,
+          heard: "",
+          feedback: "Could not catch a clear phrase. Try again slowly and keep the words separate."
+        };
+      }
+      saveState();
+      renderChunkPanel();
+      renderSessionOverlay();
+    }
+
+    async function runPronunciationCheck() {
+      if (!getRecognitionConstructor()) {
+        currentMission.lastPronunciation = {
+          score: 0,
+          heard: "",
+          feedback: "Automatic browser speech check is not available here. Use Record Myself and compare manually."
+        };
+        saveState();
+        renderPronunciationPanel();
+        renderSessionOverlay();
+        return;
+      }
+
+      elements.pronResult.innerHTML = `
+        <div class="pron-status">Listening...</div>
+        <p class="pron-note">Say the target phrase in one clean try.</p>
+      `;
+      if (sessionState.open && getSessionStepKey() === "pronunciation") {
+        const liveResult = document.getElementById("sessionMicResult");
+        if (liveResult) {
+          liveResult.className = "session-mic-result";
+          liveResult.innerHTML = `
+            <div class="pron-status">Listening...</div>
+            <p class="pron-note">Say the target phrase in one clean try.</p>
+          `;
+        }
+        elements.sessionStatus.textContent = "Listening to your phrase now.";
+      }
+
+      const target = getSelectedClipLine();
+
+      try {
+        const heard = await captureSpeechOnce();
+        const { score, feedback } = buildPronunciationFeedback(target, heard, currentMission.focusId);
+        currentMission.lastPronunciation = { score, heard, feedback };
+
+        const stats = state.pronunciationStats[currentMission.focusId] || { attempts: 0, totalScore: 0 };
+        stats.attempts += 1;
+        stats.totalScore += score;
+        state.pronunciationStats[currentMission.focusId] = stats;
+        if (score >= PRONUNCIATION_PASS_SCORE) {
+          completeModule("pronunciation");
+        } else {
+          saveState();
+          renderPronunciationPanel();
+          renderProgressPanel();
+          renderSessionOverlay();
+        }
+      } catch (_error) {
+        currentMission.lastPronunciation = {
+          score: 0,
+          heard: "",
+          feedback: "The browser could not catch a clean phrase. Try again slowly and more clearly."
+        };
+        saveState();
+        renderPronunciationPanel();
+        renderSessionOverlay();
+      }
+    }
+
+    async function toggleSelfRecording() {
+      if (mediaRecorder && mediaRecorder.state === "recording") {
+        mediaRecorder.stop();
+        renderPronunciationPanel();
+        renderSessionOverlay();
+        return;
+      }
+
+      try {
+        mediaStream = await getRecordingStream();
+      } catch (_error) {
+        currentMission.lastPronunciation = { score: 0, heard: "", feedback: "Microphone permission was not granted. Allow mic access to record yourself." };
+        saveState();
+        renderPronunciationPanel();
+        renderSessionOverlay();
+        return;
+      }
+
+      recordChunks = [];
+      mediaRecorder = new MediaRecorder(mediaStream);
+      mediaRecorder.ondataavailable = (event) => {
+        if (event.data && event.data.size > 0) {
+          recordChunks.push(event.data);
+        }
+      };
+      mediaRecorder.onstop = () => {
+        if (activeAudioUrl) {
+          URL.revokeObjectURL(activeAudioUrl);
+        }
+        const blob = new Blob(recordChunks, { type: "audio/webm" });
+        activeAudioUrl = URL.createObjectURL(blob);
+        mediaStream.getTracks().forEach((track) => track.stop());
+        mediaStream = null;
+        renderPronunciationPanel();
+        renderSessionOverlay();
+      };
+      mediaRecorder.start();
+      currentMission.lastPronunciation = {
+        score: currentMission.lastPronunciation?.score || 0,
+        heard: currentMission.lastPronunciation?.heard || "",
+        feedback: "Recording now. Say the phrase once, stop the recording, then compare your playback with the target."
+      };
+      saveState();
+      renderPronunciationPanel();
+      renderSessionOverlay();
+    }
+
+    function resetTimer() {
+      if (timerState.intervalId) {
+        window.clearInterval(timerState.intervalId);
+      }
+      timerState = { running: false, stageIndex: -1, secondsLeft: 240, totalSeconds: 240, intervalId: null, mode: "mission" };
+      updateTimerUI();
+    }
+
+    function nextTimerStage() {
+      const stages = [240, 180, 120];
+      timerState.stageIndex += 1;
+      if (timerState.stageIndex >= stages.length) {
+        const completedMode = timerState.mode;
+        resetTimer();
+        if (completedMode === "free") {
+          if (elements.freeSpeakingStatus) {
+            elements.freeSpeakingStatus.textContent = "Standalone round finished. Load another topic or run it again.";
+          }
+          renderFreeSpeakingPanel();
+          showReflectionStatus("Standalone 4-3-2 round complete.", false);
+        } else {
+          completeModule("fluency");
+          showReflectionStatus("4-3-2 ladder complete. Fluency XP awarded.", false);
+        }
+        return;
+      }
+      timerState.running = true;
+      timerState.totalSeconds = stages[timerState.stageIndex];
+      timerState.secondsLeft = stages[timerState.stageIndex];
+      updateTimerUI();
+      if (timerState.intervalId) {
+        window.clearInterval(timerState.intervalId);
+      }
+      timerState.intervalId = window.setInterval(() => {
+        timerState.secondsLeft -= 1;
+        updateTimerUI();
+        if (timerState.secondsLeft <= 0) {
+          window.clearInterval(timerState.intervalId);
+          timerState.intervalId = null;
+          window.setTimeout(nextTimerStage, 600);
+        }
+      }, 1000);
+    }
+
+    function startFluencyLadder(mode = "mission") {
+      if (timerState.running) {
+        return;
+      }
+      timerState.mode = mode;
+      renderFreeSpeakingPanel();
+      timerState.stageIndex = -1;
+      nextTimerStage();
+    }
+
+    function skipFluencyStage() {
+      if (!timerState.running) {
+        return;
+      }
+      if (timerState.intervalId) {
+        window.clearInterval(timerState.intervalId);
+      }
+      timerState.intervalId = null;
+      nextTimerStage();
+    }
+
+    function stopFluencyTimer() {
+      const stoppedMode = timerState.mode;
+      resetTimer();
+      renderFreeSpeakingPanel();
+      showReflectionStatus(stoppedMode === "free" ? "Standalone speaking timer stopped." : "Fluency timer stopped.", false);
+    }
+
+    function saveReflection() {
+      state.reflections[currentMission.date] = elements.reflectionInput.value.trim();
+      saveState();
+      showReflectionStatus("Reflection saved locally.", false);
+    }
+
+    function showReflectionStatus(message, isError) {
+      elements.reflectionStatus.textContent = message;
+      elements.reflectionStatus.style.color = isError ? "var(--ember-deep)" : "var(--ink-soft)";
+    }
+
+    function resetAllMemory() {
+      if (!window.confirm("Reset all local progress, streaks, chunk mastery, and daily memory?")) {
+        return;
+      }
+      localStorage.removeItem(STORAGE_KEY);
+      state = createDefaultState();
+      currentMission = null;
+      if (activeAudioUrl) {
+        URL.revokeObjectURL(activeAudioUrl);
+        activeAudioUrl = null;
+      }
+      ensureMission();
+      renderAll();
+      showReflectionStatus("All memory was reset.", false);
+    }
+
+    function escapeHtml(text) {
+      return String(text).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+    }
+
+    function cacheElements() {
+      ["heroMeta", "heroStats", "daySummary", "missionIntro", "missionDateTag", "missionSteps", "missionQuote", "clipTitle", "clipScene", "clipFocusTag", "clipSubtitle", "clipNote", "waveGrid", "transcriptList", "videoStage", "clipPlaybackStatus", "chunkTag", "chunkList", "pronFocusTitle", "pronFocusCopy", "pronSupportTag", "pronTargetPhrase", "pronAnchorPhrase", "pronTips", "pronDrills", "pronResult", "selfPlayback", "fluencyTitle", "fluencyCopy", "fluencyPromptTitle", "fluencyPromptLead", "fluencyPromptList", "timerLabel", "timerValue", "timerFill", "freeSpeakingTitle", "freeSpeakingCopy", "freeSpeakingTag", "freeSpeakingPromptTitle", "freeSpeakingPromptLead", "freeSpeakingPromptList", "freeSpeakingStatus", "freeTimerLabel", "freeTimerValue", "freeTimerFill", "historyList", "weakList", "reflectionInput", "reflectionStatus", "levelTag", "recordSelfBtn", "sessionOverlay", "sessionTrack", "sessionStepKicker", "sessionStepTitle", "sessionStepLead", "sessionStepBody", "sessionStatus", "sessionBackBtn", "sessionNextBtn"].forEach((id) => {
+        elements[id] = document.getElementById(id);
+      });
+    }
+
+    function bindEvents() {
+      document.getElementById("startSessionBtn").addEventListener("click", openSession);
+      document.getElementById("playTodayBtn").addEventListener("click", () => playClip("coach"));
+      document.getElementById("rerollBtn").addEventListener("click", rerollToday);
+      document.getElementById("playClipBtn").addEventListener("click", () => playClip("coach"));
+      document.getElementById("shadowBtn").addEventListener("click", () => playClip("shadow"));
+      document.getElementById("stopClipBtn").addEventListener("click", stopClipPlayback);
+      document.getElementById("moreWarmupBtn").addEventListener("click", loadMoreWarmupChunks);
+      document.getElementById("clipDoneBtn").addEventListener("click", () => completeModule("clip"));
+      document.getElementById("chunksDoneBtn").addEventListener("click", () => completeModule("warmup"));
+      document.getElementById("playTargetBtn").addEventListener("click", () => speakText(getSelectedClipLine(), { rate: 0.82 }));
+      document.getElementById("playAnchorBtn").addEventListener("click", () => speakText(getMissionFocus().anchor, { rate: 0.78 }));
+      document.getElementById("checkPronBtn").addEventListener("click", runPronunciationCheck);
+      document.getElementById("recordSelfBtn").addEventListener("click", toggleSelfRecording);
+      document.getElementById("pronDoneBtn").addEventListener("click", () => completeModule("pronunciation"));
+      document.getElementById("runFluencyBtn").addEventListener("click", startFluencyLadder);
+      document.getElementById("runFreeSpeakingBtn").addEventListener("click", () => startFluencyLadder("free"));
+      document.getElementById("newFreeTopicBtn").addEventListener("click", rerollFreeSpeakingTopic);
+      document.getElementById("nextStageBtn").addEventListener("click", skipFluencyStage);
+      document.getElementById("skipFreeSpeakingStageBtn").addEventListener("click", skipFluencyStage);
+      document.getElementById("stopTimerBtn").addEventListener("click", stopFluencyTimer);
+      document.getElementById("stopFreeSpeakingBtn").addEventListener("click", stopFluencyTimer);
+      document.getElementById("fluencyDoneBtn").addEventListener("click", () => completeModule("fluency"));
+      document.getElementById("saveReflectionBtn").addEventListener("click", saveReflection);
+      document.getElementById("resetProgressBtn").addEventListener("click", resetAllMemory);
+      document.getElementById("closeSessionBtn").addEventListener("click", closeSession);
+      document.getElementById("sessionBackBtn").addEventListener("click", previousSessionStep);
+      document.getElementById("sessionNextBtn").addEventListener("click", nextSessionStep);
+      elements.sessionOverlay.addEventListener("click", (event) => {
+        if (event.target === elements.sessionOverlay) {
+          closeSession();
+        }
+      });
+      document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape" && sessionState.open) {
+          closeSession();
+        }
+      });
+      document.addEventListener("click", (event) => {
+        if (event.target.closest("#sessionPlayCoachBtn")) {
+          playClip("coach");
+          return;
+        }
+        if (event.target.closest("#sessionShadowBtn")) {
+          playClip("shadow");
+          return;
+        }
+        if (event.target.closest("#sessionPlayTargetBtn")) {
+          speakText(getSelectedClipLine(), { rate: 0.82 });
+          return;
+        }
+        if (event.target.closest("#sessionMicCheckBtn")) {
+          runPronunciationCheck();
+          return;
+        }
+        if (event.target.closest("#sessionRecordBtn")) {
+          toggleSelfRecording();
+          return;
+        }
+        if (event.target.closest("#sessionRunFluencyBtn")) {
+          startFluencyLadder();
+          return;
+        }
+        if (event.target.closest("#sessionSkipStageBtn")) {
+          skipFluencyStage();
+          return;
+        }
+        const button = event.target.closest("[data-action]");
+        if (!button) {
+          return;
+        }
+        const action = button.getAttribute("data-action");
+        if (action === "select-line") {
+          currentMission.selectedLineIndex = Number(button.getAttribute("data-index")) || 0;
+          saveState();
+          renderClipPanel();
+          renderPronunciationPanel();
+        } else if (action === "play-chunk") {
+          playChunkAudio(button.getAttribute("data-id"));
+        } else if (action === "check-chunk") {
+          runChunkCheck(button.getAttribute("data-id"));
+        } else if (action === "more-warmup") {
+          loadMoreWarmupChunks();
+        } else if (action === "chunk-mastery") {
+          const chunkId = button.getAttribute("data-id");
+          const level = Number(button.getAttribute("data-level")) || 1;
+          setChunkMastery(chunkId, level);
+        } else if (action === "session-complete") {
+          completeSessionStep(button.getAttribute("data-step"));
+        }
+      });
+    }
+
+    function init() {
+      cacheElements();
+      prepareSpeech();
+      ensureMission();
+      renderAll();
+      bindEvents();
+      window.addEventListener("beforeunload", releasePersistentMicStream);
+      showReflectionStatus("Local memory active. Tomorrow's mission will rotate automatically.", false);
+    }
+
+    document.addEventListener("DOMContentLoaded", init);
+  </script>
+</body>
+</html>
